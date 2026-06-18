@@ -30,6 +30,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.dairyledger.ui.theme.DairyLedgerTheme
+import com.example.dairyledger.views.CollectScreen
+import com.example.dairyledger.views.DrawerNavItem
+import com.example.dairyledger.views.FarmersScreen
+import com.example.dairyledger.views.HomeScreen
+import com.example.dairyledger.views.ReportsScreen
+import com.example.dairyledger.views.SettingsScreen
+import com.example.dairyledger.views.WeeklyArchiveScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,10 +86,12 @@ fun DairyApp() {
             startDestination = BottomNavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(BottomNavItem.Home.route) { HomeScreen() }
+            composable(BottomNavItem.Home.route) { HomeScreen(navController) }
             composable(BottomNavItem.Collect.route) { CollectScreen() }
             composable(BottomNavItem.Reports.route) { ReportsScreen() }
             composable(BottomNavItem.Farmers.route) { FarmersScreen() }
+            composable(DrawerNavItem.WeeklyArchive.route) { WeeklyArchiveScreen() }
+            composable(DrawerNavItem.Settings.route) { SettingsScreen() }
         }
     }
 }
@@ -114,38 +123,5 @@ fun DairyBottomBar(navController: NavHostController) {
                 label = { Text(item.label) }
             )
         }
-    }
-}
-
-// ---- Placeholder screens (replace with real implementations) ----
-
-@Composable
-fun HomeScreen() {
-    PlaceholderScreen(title = "Home — Milk Collection Dashboard")
-}
-
-@Composable
-fun CollectScreen() {
-    PlaceholderScreen(title = "Collect — Daily Collection Entry")
-}
-
-@Composable
-fun ReportsScreen() {
-    PlaceholderScreen(title = "Reports — Weekly Report")
-}
-
-@Composable
-fun FarmersScreen() {
-    PlaceholderScreen(title = "Farmers — Farmer List")
-}
-
-@Composable
-private fun PlaceholderScreen(title: String) {
-    Surface {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(16.dp)
-        )
     }
 }
