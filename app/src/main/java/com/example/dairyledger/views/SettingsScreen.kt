@@ -21,15 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens ----------
-//private val DairyGreen = Color(0xFF1B5E20)
-private val ActiveGreen = Color(0xFF2E7D32)
-//private val ScreenBg = Color(0xFFFAF8F4)
-private val CardBorder = Color(0xFFE7E3DA)
-private val ControlFieldBg = Color(0xFFEFEBE9)
-private val MutedText = Color(0xFF6B6B6B)
-private val TextDark = Color(0xFF1A1A1A)
-private val LightCardBg = Color(0xFFF5F5F5)
+
 
 @Composable
 fun SettingsScreen() {

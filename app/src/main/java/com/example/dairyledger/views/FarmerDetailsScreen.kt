@@ -23,14 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens ----------
-private val LightGreenBg = Color(0xFFE8F5E9)
-private val CardBorder = Color(0xFFE7E3DA)
-private val MutedText = Color(0xFF6B6B6B)
-private val TextDark = Color(0xFF1A1A1A)
-private val LightCardBg = Color(0xFFF9F9F9)
-private val PremiumPremiumAlertBg = Color(0xFFFFE0B2) // Warm golden token
-private val PremiumAlertText = Color(0xFFE65100)
+
 
 data class ShiftLogItem(
     val dayLabel: String,

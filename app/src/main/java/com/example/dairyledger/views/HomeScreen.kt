@@ -24,16 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
-// ---------- Color tokens (derived from the dashboard mock) ----------
-val DairyGreen = Color(0xFF1B5E20)        // primary green (buttons, brand)
-private val DairyGreenDark = Color(0xFF14431A)    // weekly total card gradient/base
-private val DoneGreenBg = Color(0xFF2E7D32)       // "Done" pill background
-private val PendingGrayBg = Color(0xFFE0E0E0)     // "Pending" pill background
-val ScreenBg = Color(0xFFFAF8F4)          // warm off-white page background
-private val CardBorder = Color(0xFFE7E3DA)
-private val PriceCardBg = Color(0xFFF0EEE8)
-private val MutedText = Color(0xFF6B6B6B)
-
 
 data class CollectionStatus(
     val label: String,

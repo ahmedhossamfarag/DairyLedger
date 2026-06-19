@@ -20,14 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens ----------
-private val CardBorder = Color(0xFFE7E3DA)
-private val MutedText = Color(0xFF6B6B6B)
-private val TextDark = Color(0xFF1A1A1A)
-private val ValueGreen = Color(0xFF2E7D32)
-private val ActiveFarmerAvatarBG = Color(0xFFB57C1E)
-private val InactiveFarmerAvatarBG = Color(0xFFCFD8DC)
-
 data class FarmerListItem(
     val id: String,
     val name: String,

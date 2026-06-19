@@ -25,13 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
 
-// ---------- Color tokens matching HomeScreen design system ----------
-//private val DairyGreen = Color(0xFF1B5E20)        // primary green
-//private val ScreenBg = Color(0xFFFAF8F4)          // warm off-white page background
-private val CardBorder = Color(0xFFE7E3DA)
-private val MutedText = Color(0xFF6B6B6B)
-private val StatusGreen = Color(0xFF2E7D32)
-private val StepperBg = Color(0xFFF1F0EA)
 
 data class FarmerCollectionState(
     val id: String,

@@ -19,10 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens ----------
-private val CardBorder = Color(0xFFE7E3DA)
-private val MutedText = Color(0xFF6B6B6B)
-private val TextDark = Color(0xFF1A1A1A)
+
 
 @Composable
 fun AddFarmerScreen() {

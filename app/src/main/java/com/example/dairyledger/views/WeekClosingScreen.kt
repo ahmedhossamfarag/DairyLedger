@@ -20,18 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens ----------
-private val AccentGreen = Color(0xFF2E7D32)        // Metric card green background
-private val StatusGreen = Color(0xFF4CAF50)        // Status active dot indicator
-private val MetricCardBg = Color(0xFFEAEAEA)       // Light gray card background
-private val CardBorder = Color(0xFFE7E3DA)         // Subtle layout divider outlines
-private val TextDark = Color(0xFF1A1A1A)           // Dominant header text
-private val MutedText = Color(0xFF6B6B6B)          // Subtitles and descriptive text
 
-// Warning Notice Alert Tones
-private val WarningBg = Color(0xFFFEECEB)
-private val WarningBorder = Color(0xFFF5B1AA)
-private val WarningText = Color(0xFFC62828)
 
 @Composable
 fun WeekClosingScreen() {

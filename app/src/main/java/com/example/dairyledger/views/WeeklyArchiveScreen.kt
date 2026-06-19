@@ -19,12 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ---------- Design Tokens (Synchronized with design system) ----------
-private val DoneGreenBg = Color(0xFF2E7D32)       // pill background green
-private val CardBorder = Color(0xFFE7E3DA)
-private val MutedText = Color(0xFF6B6B6B)
-private val TextDark = Color(0xFF1A1A1A)
-private val ArchiveIconBg = Color(0xFFEFEBE9)     // subtle tray icon background
 
 data class FeaturedArchive(
     val weekLabel: String,

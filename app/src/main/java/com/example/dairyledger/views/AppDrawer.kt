@@ -21,26 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
-// ---------- Sidebar-specific color tokens ----------
-private val AvatarBg = Color(0xFF1E3A28)         // dark green circle behind the avatar icon
-private val DividerColor = Color(0xFFE7E3DA)
-private val SecondaryText = Color(0xFF6B6B6B)
-private val SectionLabelColor = Color(0xFF3A3A3A)
 
-
-sealed class DrawerNavItem(
-    val route: String,
-    val label: String,
-    val icon: ImageVector
-) {
-    data object WeeklyArchive : DrawerNavItem("weekly-archive", "Weekly Archive", Icons.Filled.Lock)
-    data object Settings : DrawerNavItem("settings", "Settings", Icons.Filled.Settings)
-}
-
-private val drawerNavItems = listOf(
-    DrawerNavItem.WeeklyArchive,
-    DrawerNavItem.Settings,
-)
 
 /**
  * Sidebar / nav-drawer content shown for the Collection Agent profile.
