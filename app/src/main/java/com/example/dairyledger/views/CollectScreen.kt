@@ -251,7 +251,7 @@ private fun FarmerCollectionCard(
                     onClick = {
                         val currentVal = volumeText.toDoubleOrNull() ?: 0.0
                         if (currentVal >= 0.25) {
-                            onVolumeChange(String.format(Locale.US, "%.1f", currentVal - 0.25))
+                            onVolumeChange(String.format(Locale.US, "%.2f", currentVal - 0.25))
                         }
                     },
                     modifier = Modifier
@@ -297,7 +297,7 @@ private fun FarmerCollectionCard(
                 IconButton(
                     onClick = {
                         val currentVal = volumeText.toDoubleOrNull() ?: 0.0
-                        onVolumeChange(String.format(Locale.US, "%.1f", currentVal + 0.25))
+                        onVolumeChange(String.format(Locale.US, "%.2f", currentVal + 0.25))
                     },
                     modifier = Modifier
                         .size(40.dp)

@@ -1,6 +1,7 @@
 package com.example.dairyledger.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.FarmersViewModel
 
 data class FarmerListItem(
-    val id: String,
+    val id: Int,
     val name: String,
     val phone: String,
     val initials: String,
@@ -32,12 +33,13 @@ data class FarmerListItem(
 fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     val farmersCount: Int = 24
     val farmersList: List<FarmerListItem> = listOf(
-        FarmerListItem("#9822", "Ahmed Hassan", "0123456789", "AH"),
-        FarmerListItem("#9825", "Mariya Sameer", "0987654321", "MS"),
-        FarmerListItem("#9829", "Khalid Ibrahim", "0123456789", "KI"),
-        FarmerListItem("#9831", "Zoya Fatima", "0987654321",  "ZF"),
-        FarmerListItem("#9844", "Omar Farooq", "0123456789",  "OF")
+        FarmerListItem(1, "Ahmed Hassan", "0123456789", "AH"),
+        FarmerListItem(2, "Mariya Sameer", "0987654321", "MS"),
+        FarmerListItem(3, "Khalid Ibrahim", "0123456789", "KI"),
+        FarmerListItem(4, "Zoya Fatima", "0987654321",  "ZF"),
+        FarmerListItem(5, "Omar Farooq", "0123456789",  "OF")
     )
+    val onFarmerCardClick: (Int) -> Unit = { farmerId -> navigator.gotoFarmerDetails(farmerId)}
     val onAddFarmerClick: () -> Unit = { navigator.gotoAddFarmer() }
 
 
@@ -137,7 +139,7 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 farmersList.forEach { farmer ->
-                    FarmerCardRow(farmer = farmer)
+                    FarmerCardRow(farmer = farmer, onFarmerCardClick = onFarmerCardClick)
                 }
                 Spacer(Modifier.height(80.dp)) // Extra layout padding for FAB overlap
             }
@@ -175,9 +177,9 @@ private fun FarmersTopBar() {
 }
 
 @Composable
-private fun FarmerCardRow(farmer: FarmerListItem) {
+private fun FarmerCardRow(farmer: FarmerListItem, onFarmerCardClick: (Int) -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onFarmerCardClick(farmer.id.toInt()) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
