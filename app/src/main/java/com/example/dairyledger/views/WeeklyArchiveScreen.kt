@@ -1,6 +1,7 @@
 package com.example.dairyledger.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,21 +29,23 @@ data class FeaturedArchive(
 )
 
 data class WeeklyArchiveItem(
+    val id: Int,
     val weekLabel: String,
     val dateRange: String,
     val yield: String,
 )
 
 @Composable
-fun WeeklyArchiveScreen() {
+fun WeeklyArchiveScreen(navigator: Navigator) {
     val featuredArchive: FeaturedArchive = FeaturedArchive("WEEK 22", "Jun 03 - Jun 09, 2024", "4,720", 42)
     val recentArchives: List<WeeklyArchiveItem> = listOf(
-        WeeklyArchiveItem("Week 21", "May 27 - Jun 02", "4,680"),
-        WeeklyArchiveItem("Week 20", "May 20 - May 26", "4,595"),
-        WeeklyArchiveItem("Week 19", "May 13 - May 19", "4,810"),
-        WeeklyArchiveItem("Week 18", "May 06 - May 12", "4,420")
+        WeeklyArchiveItem(1, "Week 21", "May 27 - Jun 02", "4,680"),
+        WeeklyArchiveItem(2, "Week 20", "May 20 - May 26", "4,595"),
+        WeeklyArchiveItem(3, "Week 19", "May 13 - May 19", "4,810"),
+        WeeklyArchiveItem(4, "Week 18", "May 06 - May 12", "4,420")
     )
-    val onViewReportClick: () -> Unit = {}
+    val onViewReportClick: () -> Unit = { navigator.gotoReports() }
+    val onCardClick: (Int) -> Unit = { id -> navigator.gotoWeekReport(id) }
     val onLoadOlderClick: () -> Unit = {}
 
     Scaffold(
@@ -92,7 +95,7 @@ fun WeeklyArchiveScreen() {
             // Main Core Archive Stack
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 recentArchives.forEach { archive ->
-                    WeeklyArchiveRowCard(item = archive)
+                    WeeklyArchiveRowCard(item = archive, onCardClick = onCardClick)
                 }
             }
 
@@ -227,17 +230,19 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
 // ---------- Intermediate Standard Card Component ----------
 
 @Composable
-private fun WeeklyArchiveRowCard(item: WeeklyArchiveItem) {
+private fun WeeklyArchiveRowCard(item: WeeklyArchiveItem, onCardClick: (Int) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
     ) {
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(14.dp)
+                .clickable{ onCardClick(item.id) },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -268,14 +273,5 @@ private fun WeeklyArchiveRowCard(item: WeeklyArchiveItem) {
                 }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-private fun WeeklyArchiveScreenPreview() {
-    MaterialTheme {
-        WeeklyArchiveScreen()
     }
 }

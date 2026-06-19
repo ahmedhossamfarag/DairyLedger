@@ -29,7 +29,7 @@ data class FarmerListItem(
 )
 
 @Composable
-fun FarmersScreen() {
+fun FarmersScreen(navigator: Navigator) {
     val farmersCount: Int = 24
     val farmersList: List<FarmerListItem> = listOf(
         FarmerListItem("#9822", "Ahmed Hassan", "0123456789", "AH"),
@@ -38,7 +38,7 @@ fun FarmersScreen() {
         FarmerListItem("#9831", "Zoya Fatima", "0987654321",  "ZF"),
         FarmerListItem("#9844", "Omar Farooq", "0123456789",  "OF")
     )
-    val onAddFarmerClick: () -> Unit = {}
+    val onAddFarmerClick: () -> Unit = { navigator.gotoAddFarmer() }
 
 
     Scaffold(
@@ -249,13 +249,5 @@ private fun FarmerCardRow(farmer: FarmerListItem) {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-private fun WeeklyArchiveScreenPreview() {
-    MaterialTheme {
-        FarmersScreen()
     }
 }

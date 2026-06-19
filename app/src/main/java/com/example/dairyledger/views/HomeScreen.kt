@@ -33,7 +33,7 @@ data class CollectionStatus(
 )
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, navigator: Navigator) {
     val weekLabel: String = "Week 23 (Jun 10 - Jun 16)"
     val morning: CollectionStatus = CollectionStatus("Morning\nCollection", true, "350", 24)
     val evening: CollectionStatus = CollectionStatus("Evening\nCollection", false, "290", 24)
@@ -41,10 +41,9 @@ fun HomeScreen(navController: NavHostController) {
     val unitPrice: String = "$0.45"
     val agentName: String = "Collection Agent"
     val appVersion: String = "App Version 2.4.1 (Stable)"
-    val onMorningCollectionClick: () -> Unit = {}
-    val onEveningCollectionClick: () -> Unit = {}
-    val onViewWeeklyReportClick: () -> Unit = {}
-    val onEditPriceClick: () -> Unit = {}
+    val onMorningCollectionClick: () -> Unit = { navigator.gotoCollectWithType("morning") }
+    val onEveningCollectionClick: () -> Unit = { navigator.gotoCollectWithType("evening") }
+    val onViewWeeklyReportClick: () -> Unit = { navigator.gotoReports() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -110,7 +109,6 @@ fun HomeScreen(navController: NavHostController) {
 
                 UnitPriceCard(
                     price = unitPrice,
-                    onEditClick = onEditPriceClick
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -315,7 +313,7 @@ private fun WeeklyTotalCard(totalLiters: String) {
 // ---------- Unit price card ----------
 
 @Composable
-private fun UnitPriceCard(price: String, onEditClick: () -> Unit) {
+private fun UnitPriceCard(price: String) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = PriceCardBg,

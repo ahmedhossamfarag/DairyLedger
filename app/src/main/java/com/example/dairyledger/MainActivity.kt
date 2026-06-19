@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,7 @@ import com.example.dairyledger.views.FarmerDetailsScreen
 import com.example.dairyledger.views.FarmersScreen
 import com.example.dairyledger.views.HomeScreen
 import com.example.dairyledger.views.NavItem
+import com.example.dairyledger.views.Navigator
 import com.example.dairyledger.views.ReportsScreen
 import com.example.dairyledger.views.SettingsScreen
 import com.example.dairyledger.views.WeekClosingScreen
@@ -44,17 +46,50 @@ class MainActivity : ComponentActivity() {
 fun DairyApp() {
     val navController = rememberNavController()
 
-    val gotoHome = { navController.navigate(NavItem.Home.route) }
-    val gotoCollect = { navController.navigate(NavItem.Collect.route) }
-    val gotoReports = { navController.navigate(NavItem.Reports.route) }
-    val gotoFarmers = { navController.navigate(NavItem.Farmers.route) }
-    val gotoWeeklyArchive = { navController.navigate(NavItem.WeeklyArchive.route) }
-    val gotoSettings = { navController.navigate(NavItem.Settings.route) }
-    val gotoWeekReport = { weekId: Int -> navController.navigate("week-report/$weekId") }
-    val gotoCollectWithType = { type: String -> navController.navigate("collect-with-type/$type") }
-    val gotoAddFarmer = { navController.navigate(NavItem.AddFarmer.route) }
-    val gotoFarmerDetails = { farmerId: Int -> navController.navigate("farmer-details/$farmerId") }
+    val navigateTab = { route: String ->
+        navController.navigate(route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+        }
+    }
 
+    val gotoHome = { navigateTab(NavItem.Home.defaultRoute) }
+    val gotoCollect = { navigateTab(NavItem.Collect.defaultRoute) }
+    val gotoReports = { navigateTab(NavItem.Reports.defaultRoute) }
+    val gotoFarmers = { navigateTab(NavItem.Farmers.defaultRoute) }
+
+    val gotoWeeklyArchive = { navigateTab(NavItem.WeeklyArchive.defaultRoute) }
+    val gotoSettings = { navigateTab(NavItem.Settings.defaultRoute) }
+    val gotoWeekReport = { weekId: Int ->
+        navigateTab(NavItem.Reports.createRoute(weekId))
+    }
+    val gotoCollectWithType = { type: String ->
+        navigateTab(NavItem.Collect.createRoute(type))
+    }
+    val gotoAddFarmer = { navController.navigate(NavItem.AddFarmer.route) }
+    val gotoFarmerDetails = { farmerId: Int ->
+        navController.navigate(NavItem.FarmerDetails.createRoute(farmerId))
+    }
+    val gotoWeekClosing = { navController.navigate(NavItem.WeekClosing.route) }
+    val goback = { navController.popBackStack() }
+
+
+    val navigator = Navigator(
+        gotoHome,
+        gotoCollect,
+        gotoReports,
+        gotoFarmers,
+        gotoWeeklyArchive,
+        gotoSettings,
+        gotoWeekReport,
+        gotoCollectWithType,
+        gotoAddFarmer,
+        gotoFarmerDetails,
+        gotoWeekClosing,
+        goback
+    )
 
     Scaffold(
         bottomBar = { DairyBottomBar(navController) }
@@ -64,23 +99,32 @@ fun DairyApp() {
             startDestination = NavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(NavItem.Home.route) { HomeScreen(navController) }
-            composable(NavItem.Collect.route) { CollectScreen() }
-            composable(NavItem.Reports.route) { ReportsScreen() }
-            composable(NavItem.Farmers.route) { FarmersScreen() }
-            composable(NavItem.WeeklyArchive.route) { WeeklyArchiveScreen() }
-            composable(NavItem.Settings.route) { SettingsScreen() }
-            composable(NavItem.WeekReport.route,
-                arguments = listOf(navArgument("weekId") { type = NavType.IntType })
-            ) { ReportsScreen() }
-            composable(NavItem.CollectWithType.route,
+            composable(NavItem.Home.route) { HomeScreen(navController, navigator) }
+            composable(NavItem.Collect.route,
                 arguments = listOf(navArgument("type") { type = NavType.StringType })
-            ) { CollectScreen() }
-            composable(NavItem.AddFarmer.route) { AddFarmerScreen() }
+            ) {
+                val type = it.arguments?.getString("type") ?: "default"
+                CollectScreen(type, navigator)
+            }
+            composable(NavItem.Reports.route,
+                arguments = listOf(navArgument("weekId") { type = NavType.IntType })
+            ) {
+                val weekId = it.arguments?.getInt("weekId") ?: -1
+                ReportsScreen(weekId)
+            }
+            composable(NavItem.Farmers.route) { FarmersScreen(navigator) }
+            composable(NavItem.WeeklyArchive.route) { WeeklyArchiveScreen(navigator) }
+            composable(NavItem.Settings.route) { SettingsScreen() }
+            composable(NavItem.AddFarmer.route) { AddFarmerScreen(navigator) }
+
+
             composable(NavItem.FarmerDetails.route,
-                    arguments = listOf(navArgument("farmerId") { type = NavType.IntType })
-                ) { FarmerDetailsScreen() }
-            composable(NavItem.WeekClosing.route) { WeekClosingScreen() }
+                arguments = listOf(navArgument("farmerId") { type = NavType.IntType })
+                ) {
+                val farmerId = it.arguments?.getInt("farmerId") ?: 0
+                FarmerDetailsScreen(farmerId, navigator)
+            }
+            composable(NavItem.WeekClosing.route) { WeekClosingScreen(navigator) }
         }
     }
 }

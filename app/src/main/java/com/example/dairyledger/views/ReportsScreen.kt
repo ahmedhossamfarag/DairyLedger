@@ -34,8 +34,8 @@ data class ReportRowItem(
 )
 
 @Composable
-fun ReportsScreen() {
-    val weekTitle: String = "Week 23"
+fun ReportsScreen(weekId: Int = -1) {
+    val weekTitle: String = "Week $weekId"
     val dateRange: String = "June 10 - June 16, 2024"
     val totalMilk: String = "4,830"
     val totalRevenue: String = "$2,173"

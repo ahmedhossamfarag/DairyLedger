@@ -18,19 +18,18 @@ fun DairyBottomBar(navController: NavHostController) {
 
     NavigationBar {
         bottomNavItems.forEach { item ->
-            val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+            val selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("/") == item.baseRoute } == true
 
             NavigationBarItem(
                 selected = selected,
                 onClick = {
                     if (!selected) {
-                        navController.navigate(item.route) {
+                        navController.navigate(item.defaultRoute) {
                             // Avoid building up a large stack as the user taps tabs.
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 },

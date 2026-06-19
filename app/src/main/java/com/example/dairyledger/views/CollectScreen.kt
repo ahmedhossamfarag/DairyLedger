@@ -35,8 +35,8 @@ data class FarmerCollectionState(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CollectScreen() {
-    val titleLabel = "Morning Collection"
+fun CollectScreen(type: String = "default", navigator: Navigator) {
+    val titleLabel = "$type Collection"
     val dateLabel = "Monday, June 15"
     val initialFarmers = listOf(
         FarmerCollectionState("1", "Ahmed Hassan", 12.5, true),
@@ -44,7 +44,7 @@ fun CollectScreen() {
         FarmerCollectionState("3", "John Doe", 8.2, false),
         FarmerCollectionState("4", "Ibrahim Malik", 15.0, false)
     )
-    val onSaveCollectionClick: (Map<String, Double>) -> Unit = {}
+    val onSaveCollectionClick: (Map<String, Double>) -> Unit = { navigator.gotoHome() }
 
     var searchQuery by remember { mutableStateOf("") }
     
@@ -308,15 +308,5 @@ private fun FarmerCollectionCard(
                 }
             }
         }
-    }
-}
-
-// ---------- Screen Layout Preview Block ----------
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-private fun CollectionEntryScreenPreview() {
-    MaterialTheme {
-        CollectScreen()
     }
 }

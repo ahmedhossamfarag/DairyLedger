@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun WeekClosingScreen() {
+fun WeekClosingScreen(navigator: Navigator) {
     val weekEndingLabel: String = "Week Ending Oct 27, 2023"
     val totalMilkCollected: String = "4,830"
     val totalAmountCollected: String = "$2,173.50"
-    val onArchiveAndCloseClick: () -> Unit = {}
+    val onArchiveAndCloseClick: () -> Unit = { navigator.gotoHome() }
     val onDownloadPdfFirstClick: () -> Unit = {}
 
     Scaffold(
@@ -299,13 +299,5 @@ private fun SystemReadinessPanel() {
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 944)
-@Composable
-private fun WeekClosingScreenPreview() {
-    MaterialTheme {
-        WeekClosingScreen()
     }
 }

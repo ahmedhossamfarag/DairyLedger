@@ -33,11 +33,11 @@ data class ShiftLogItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FarmerDetailsScreen() {
+fun FarmerDetailsScreen(farmerId: Int = 0, navigator: Navigator) {
 
     val farmerName: String = "Ahmed Hassan"
     val phone: String = "0123456789"
-    val idNumber: String = "#9822"
+    val idNumber: String = "$farmerId"
     val statusLabel: String = "Active"
     val morningTotal: String = "78"
     val eveningTotal: String = "74"
@@ -449,13 +449,5 @@ private fun PremiumQualityBatchAlertCard() {
                 Text(text = "Fat content averaged 4.2% this week.", fontSize = 12.sp, color = PremiumAlertText.copy(alpha = 0.85f))
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 1400)
-@Composable
-private fun FarmerDetailsScreenPreview() {
-    MaterialTheme {
-        FarmerDetailsScreen()
     }
 }

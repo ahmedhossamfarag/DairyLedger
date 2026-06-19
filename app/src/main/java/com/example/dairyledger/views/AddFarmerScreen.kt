@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun AddFarmerScreen() {
+fun AddFarmerScreen(navigator: Navigator) {
     val routeLabel = "Register a new producer to the collection route #42."
-    val onCancelClick: () -> Unit = {}
-    val onSaveFarmerClick: (name: String, phone: String, address: String, notes: String) -> Unit = { _, _, _, _ -> }
+    val onCancelClick: () -> Unit = { navigator.gotoFarmers() }
+    val onSaveFarmerClick: (name: String, phone: String, address: String, notes: String) -> Unit = { _, _, _, _ ->  navigator.gotoFarmers() }
 
     var farmerName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -220,13 +220,5 @@ private fun FormInputField(
                 unfocusedBorderColor = CardBorder
             )
         )
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 844)
-@Composable
-private fun WeeklyArchiveScreenPreview() {
-    MaterialTheme {
-        AddFarmerScreen()
     }
 }
