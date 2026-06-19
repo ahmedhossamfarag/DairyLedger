@@ -1,5 +1,6 @@
 package com.example.dairyledger.views
 
+import android.icu.text.DecimalFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import java.util.Locale
 
 
 data class ReportRowItem(
@@ -39,10 +41,13 @@ fun ReportsScreen(
     reportsViewModel: ReportsViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+
     val weekTitle: String = "Week ${reportsViewModel.weekId}"
     val dateRange: String = "June 10 - June 16, 2024"
-    val totalMilk: String = "4,830"
-    val totalRevenue: String = "$2,173"
+    val totalMilk: Double = 4830.0
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    val totalRevenue: String = numberFormatter.format(unitPrice * totalMilk)
     val reportData: List<ReportRowItem> = listOf(
         ReportRowItem("#8821", "Rajesh Meena", "RM", "420.5", "$0.45", "$189.22", Color(0xFF2E7D32)),
         ReportRowItem("#8822", "Anita Sharma", "AS", "390.0", "$0.45", "$175.50", Color(0xFFB0BEC5)),
@@ -115,7 +120,7 @@ fun ReportsScreen(
             ) {
                 SummaryMetricCard(
                     title = "TOTAL MILK",
-                    value = totalMilk,
+                    value = numberFormatter.format( totalMilk),
                     suffix = "Ltr",
                     valueColor = DairyGreen,
                     modifier = Modifier.weight(1f)
@@ -132,7 +137,7 @@ fun ReportsScreen(
             Spacer(Modifier.height(16.dp))
 
             // Detailed Data Table Card
-            DetailedReportTable(reportData = reportData, totalMilk = totalMilk, totalRevenue = totalRevenue)
+            DetailedReportTable(reportData = reportData, totalMilk = numberFormatter.format(totalMilk), totalRevenue = totalRevenue)
 
             Spacer(Modifier.height(16.dp))
 

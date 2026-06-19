@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.CurrentWeekViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import java.text.DecimalFormat
+import java.util.Locale
 
 
 @Composable
@@ -28,9 +30,12 @@ fun WeekClosingScreen(
     currentWeekViewModel: CurrentWeekViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+
     val weekEndingLabel: String = "Week Ending Oct 27, 2023"
-    val totalMilkCollected: String = "4,830"
-    val totalAmountCollected: String = "$2,173.50"
+    val totalMilkCollected: Double = 4830.0
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    val totalAmountCollected: String = numberFormatter.format(unitPrice * totalMilkCollected)
     val onArchiveAndCloseClick: () -> Unit = { navigator.gotoHome() }
     val onDownloadPdfFirstClick: () -> Unit = {}
 
@@ -69,7 +74,7 @@ fun WeekClosingScreen(
             Spacer(Modifier.height(20.dp))
 
             // Card 1: Total Milk Collected Summary (Primary Highlight Card)
-            PrimaryMetricHighlightCard(value = totalMilkCollected)
+            PrimaryMetricHighlightCard(value = numberFormatter.format(totalMilkCollected))
 
             Spacer(Modifier.height(14.dp))
 

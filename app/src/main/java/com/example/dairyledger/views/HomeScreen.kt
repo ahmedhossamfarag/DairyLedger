@@ -17,6 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,6 +28,8 @@ import androidx.navigation.NavHostController
 import com.example.dairyledger.models.HomeViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
+import java.util.Locale
 
 
 data class CollectionStatus(
@@ -41,11 +46,13 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+
     val weekLabel: String = "Week 23 (Jun 10 - Jun 16)"
     val morning: CollectionStatus = CollectionStatus("Morning\nCollection", true, "350", 24)
     val evening: CollectionStatus = CollectionStatus("Evening\nCollection", false, "290", 24)
     val weeklyTotalLiters: String = "4,830"
-    val unitPrice: String = "$0.45"
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
     val agentName: String = "Collection Agent"
     val appVersion: String = "App Version 2.4.1 (Stable)"
     val onMorningCollectionClick: () -> Unit = { navigator.gotoCollectWithType("morning") }
@@ -115,7 +122,7 @@ fun HomeScreen(
                 Spacer(Modifier.height(16.dp))
 
                 UnitPriceCard(
-                    price = unitPrice,
+                    price = numberFormatter.format(unitPrice),
                 )
 
                 Spacer(Modifier.height(24.dp))

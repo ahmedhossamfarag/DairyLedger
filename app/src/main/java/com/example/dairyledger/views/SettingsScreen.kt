@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,19 +26,46 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.SettingsViewModel
+import java.text.DecimalFormat
+import java.util.Locale
 
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     val agentName: String = "Collection Agent"
     val agentRoute: String = "Route #42 - North District"
-    val onSaveConfigClick: (Double, String, Boolean, String) -> Unit = { _, _, _, _ -> }
+    val onSaveConfigClick: (Double) -> Unit = { unitPrice -> settingsViewModel.setDefaultPrice(unitPrice) }
     val onResetDefaultsClick: () -> Unit = {}
 
+    val context = LocalContext.current // Get the context
+
+    LaunchedEffect(Unit) {
+        settingsViewModel.events.collect { event ->
+            when (event) {
+                is SettingsViewModel.UiEvent.SettingsSaved -> {
+                    // Show the toast message here
+                    android.widget.Toast.makeText(
+                        context,
+                        "Configuration saved successfully",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is SettingsViewModel.UiEvent.Error -> {
+                    // Handle error event
+                    android.widget.Toast.makeText(
+                        context,
+                        event.message,
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
     // Component Interaction States
-    var unitPrice by remember { mutableStateOf(0.45) }
+    val defaultPrice by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    var unitPrice by remember { mutableStateOf(defaultPrice) }
     var resetDay by remember { mutableStateOf("Friday Evening") }
-    var isBackupEnabled by remember { mutableStateOf(true) }
     var selectedCurrency by remember { mutableStateOf("EGP") }
 
     Scaffold(
@@ -86,7 +114,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 
             // Action Execution Buttons Stack
             Button(
-                onClick = { onSaveConfigClick(unitPrice, resetDay, isBackupEnabled, selectedCurrency) },
+                onClick = { onSaveConfigClick(unitPrice) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -170,7 +198,9 @@ private fun AgentProfileCard(name: String, route: String) {
                     imageVector = Icons.Default.Person, 
                     contentDescription = null, 
                     tint = Color.White,
-                    modifier = Modifier.fillMaxSize().padding(8.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
                 )
             }
             Spacer(Modifier.width(16.dp))
@@ -185,7 +215,9 @@ private fun AgentProfileCard(name: String, route: String) {
 
 @Composable
 private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit) {
-    var textValue by remember(currentPrice) { mutableStateOf(currentPrice.toString()) }
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+
+    var textValue by remember(currentPrice) { mutableStateOf(numberFormatter.format(currentPrice)) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.FarmerDetailsViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import java.text.DecimalFormat
+import java.util.Locale
 
 
 data class ShiftLogItem(
@@ -38,6 +40,7 @@ fun FarmerDetailsScreen(
     farmerDetailsViewModel: FarmerDetailsViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
 
     val farmerName: String = "Ahmed Hassan"
     val phone: String = "0123456789"
@@ -46,8 +49,8 @@ fun FarmerDetailsScreen(
     val morningTotal: String = "78"
     val eveningTotal: String = "74"
     val cumulativeTotal: String = "152"
-    val unitPrice: String = "$0.45 / L"
-    val totalAmountDue: String = "$68.40"
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    val totalAmountDue: String = numberFormatter.format (cumulativeTotal.toDouble() * unitPrice)
     val weeklyShiftLogs: List<ShiftLogItem> = listOf(
         ShiftLogItem("Mon", "12.5 L", "11.0 L"),
         ShiftLogItem("Tue", "13.0 L", "10.5 L"),
@@ -114,7 +117,7 @@ fun FarmerDetailsScreen(
 
             // Financial Ledger Overview Panel Card Container Block
             FinancialSummaryCard(
-                unitPrice = unitPrice,
+                unitPrice = numberFormatter.format(unitPrice),
                 totalDue = totalAmountDue,
             )
 
