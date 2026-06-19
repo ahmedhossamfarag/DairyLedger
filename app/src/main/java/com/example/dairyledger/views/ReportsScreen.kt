@@ -18,9 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.models.ReportsViewModel
+import com.example.dairyledger.models.SettingsViewModel
 
 
 data class ReportRowItem(
@@ -34,8 +35,11 @@ data class ReportRowItem(
 )
 
 @Composable
-fun ReportsScreen(weekId: Int = -1) {
-    val weekTitle: String = "Week $weekId"
+fun ReportsScreen(
+    reportsViewModel: ReportsViewModel,
+    settingsViewModel: SettingsViewModel
+) {
+    val weekTitle: String = "Week ${reportsViewModel.weekId}"
     val dateRange: String = "June 10 - June 16, 2024"
     val totalMilk: String = "4,830"
     val totalRevenue: String = "$2,173"
@@ -288,13 +292,5 @@ private fun DetailedReportTable(reportData: List<ReportRowItem>, totalMilk: Stri
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 964)
-@Composable
-private fun WeeklyReportScreenPreview() {
-    MaterialTheme {
-        ReportsScreen()
     }
 }

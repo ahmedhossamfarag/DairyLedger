@@ -33,8 +33,28 @@ class DairyRepository(context: Context) {
         return start to end
     }
 
+
+    // ============================================================
+    // Get Week
+    // ============================================================
+
     /** Fetches the most recently created week, or null if none exist yet. */
-    private suspend fun currentWeekOrNull(): Week? = weekDao.getCurrentWeek()
+    suspend fun currentWeekOrNull(): Week? = weekDao.getCurrentWeek()
+
+    suspend fun getWeekById(weekId: Long): Week? {
+        return weekDao.getWeekById(weekId)
+    }
+
+
+
+    // ============================================================
+    // Get Farmer
+    // ============================================================
+
+    suspend fun getFarmerById(farmerId: Long): Farmer? {
+        return farmerDao.getFarmerById(farmerId)
+    }
+
 
     // ============================================================
     // Add Farmer
@@ -126,8 +146,8 @@ class DairyRepository(context: Context) {
     // Get all Weeks Total Dairies amount
     // ============================================================
 
-    suspend fun getAllWeeksTotals(): List<WeekTotal> {
-        return dairyDao.getAllWeeksTotals()
+    suspend fun getAllWeeksTotals(limit: Int = 5): List<WeekTotal> {
+        return dairyDao.getAllWeeksTotals(limit = limit)
     }
 
     // ============================================================

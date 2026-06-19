@@ -247,9 +247,10 @@ interface DairyDao {
         LEFT JOIN dairy d ON d.collectionId = c.id
         GROUP BY w.id, w.startDate
         ORDER BY w.startDate DESC
+        LIMIT :limit
         """
     )
-    suspend fun getAllWeeksTotals(): List<WeekTotal>
+    suspend fun getAllWeeksTotals(limit: Int = 5): List<WeekTotal>
 
     // ---------- A farmer's dairies for current week, with collection type ----------
     @Query(

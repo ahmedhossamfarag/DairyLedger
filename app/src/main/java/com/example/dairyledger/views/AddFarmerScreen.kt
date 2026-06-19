@@ -15,14 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.dairyledger.models.FarmersViewModel
 
 
 @Composable
-fun AddFarmerScreen(navigator: Navigator) {
+fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     val routeLabel = "Register a new producer to the collection route #42."
     val onCancelClick: () -> Unit = { navigator.gotoFarmers() }
     val onSaveFarmerClick: (name: String, phone: String, address: String, notes: String) -> Unit = { _, _, _, _ ->  navigator.gotoFarmers() }

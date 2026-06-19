@@ -17,18 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.dairyledger.models.SettingsViewModel
 
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     val agentName: String = "Collection Agent"
     val agentRoute: String = "Route #42 - North District"
-    val onBackClick: () -> Unit = {}
-    val onCalendarClick: () -> Unit = {}
     val onSaveConfigClick: (Double, String, Boolean, String) -> Unit = { _, _, _, _ -> }
     val onResetDefaultsClick: () -> Unit = {}
 
@@ -41,10 +38,7 @@ fun SettingsScreen() {
     Scaffold(
         containerColor = ScreenBg,
         topBar = {
-            SettingsTopBar(
-                onBackClick = onBackClick,
-                onCalendarClick = onCalendarClick
-            )
+            SettingsTopBar()
         },
     ) { innerPadding ->
         Column(
@@ -123,7 +117,7 @@ fun SettingsScreen() {
 // ---------- Sub-Components Implementation ----------
 
 @Composable
-private fun SettingsTopBar(onBackClick: () -> Unit, onCalendarClick: () -> Unit) {
+private fun SettingsTopBar() {
     Surface(color = ScreenBg) {
         Row(
             modifier = Modifier
@@ -133,8 +127,8 @@ private fun SettingsTopBar(onBackClick: () -> Unit, onCalendarClick: () -> Unit)
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBackClick) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back", tint = TextDark)
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = "Go back", tint = TextDark)
                 }
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -338,13 +332,5 @@ private fun CurrencyCard(currency: String, onCurrencyClick: () -> Unit) {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 390, heightDp = 744)
-@Composable
-private fun SettingsScreenPreview() {
-    MaterialTheme {
-        SettingsScreen()
     }
 }

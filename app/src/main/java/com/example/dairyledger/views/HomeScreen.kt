@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.dairyledger.models.HomeViewModel
+import com.example.dairyledger.models.SettingsViewModel
 import kotlinx.coroutines.launch
 
 
@@ -33,7 +35,12 @@ data class CollectionStatus(
 )
 
 @Composable
-fun HomeScreen(navController: NavHostController, navigator: Navigator) {
+fun HomeScreen(
+    navController: NavHostController,
+    navigator: Navigator,
+    homeViewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     val weekLabel: String = "Week 23 (Jun 10 - Jun 16)"
     val morning: CollectionStatus = CollectionStatus("Morning\nCollection", true, "350", 24)
     val evening: CollectionStatus = CollectionStatus("Evening\nCollection", false, "290", 24)

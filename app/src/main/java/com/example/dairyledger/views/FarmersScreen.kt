@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.models.FarmersViewModel
 
 data class FarmerListItem(
     val id: String,
@@ -29,7 +29,7 @@ data class FarmerListItem(
 )
 
 @Composable
-fun FarmersScreen(navigator: Navigator) {
+fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     val farmersCount: Int = 24
     val farmersList: List<FarmerListItem> = listOf(
         FarmerListItem("#9822", "Ahmed Hassan", "0123456789", "AH"),

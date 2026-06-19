@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.models.WeeklyArchiveViewModel
 
 
 data class FeaturedArchive(
@@ -36,7 +36,7 @@ data class WeeklyArchiveItem(
 )
 
 @Composable
-fun WeeklyArchiveScreen(navigator: Navigator) {
+fun WeeklyArchiveScreen(navigator: Navigator, weekArchiveViewModel: WeeklyArchiveViewModel) {
     val featuredArchive: FeaturedArchive = FeaturedArchive("WEEK 22", "Jun 03 - Jun 09, 2024", "4,720", 42)
     val recentArchives: List<WeeklyArchiveItem> = listOf(
         WeeklyArchiveItem(1, "Week 21", "May 27 - Jun 02", "4,680"),

@@ -16,14 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.dairyledger.models.CurrentWeekViewModel
+import com.example.dairyledger.models.SettingsViewModel
 
 
 @Composable
-fun WeekClosingScreen(navigator: Navigator) {
+fun WeekClosingScreen(
+    navigator: Navigator,
+    currentWeekViewModel: CurrentWeekViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     val weekEndingLabel: String = "Week Ending Oct 27, 2023"
     val totalMilkCollected: String = "4,830"
     val totalAmountCollected: String = "$2,173.50"

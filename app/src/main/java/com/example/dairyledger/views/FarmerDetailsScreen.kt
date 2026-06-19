@@ -19,10 +19,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.dairyledger.models.FarmerDetailsViewModel
+import com.example.dairyledger.models.SettingsViewModel
 
 
 data class ShiftLogItem(
@@ -33,11 +33,15 @@ data class ShiftLogItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FarmerDetailsScreen(farmerId: Int = 0, navigator: Navigator) {
+fun FarmerDetailsScreen(
+    navigator: Navigator,
+    farmerDetailsViewModel: FarmerDetailsViewModel,
+    settingsViewModel: SettingsViewModel
+) {
 
     val farmerName: String = "Ahmed Hassan"
     val phone: String = "0123456789"
-    val idNumber: String = "$farmerId"
+    val idNumber: String = "${farmerDetailsViewModel.farmerId}"
     val statusLabel: String = "Active"
     val morningTotal: String = "78"
     val eveningTotal: String = "74"
@@ -52,7 +56,7 @@ fun FarmerDetailsScreen(farmerId: Int = 0, navigator: Navigator) {
         ShiftLogItem("Fri", "13.2 L", "14.1 L"),
         ShiftLogItem("Sat", "14.0 L", "14.6 L")
     )
-    val onBackClick: () -> Unit = {}
+    val onBackClick: () -> Unit = { navigator.goback() }
 
     Scaffold(
         containerColor = ScreenBg,

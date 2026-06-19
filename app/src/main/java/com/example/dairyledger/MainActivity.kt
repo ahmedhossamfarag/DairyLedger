@@ -7,13 +7,28 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.dairyledger.data.DairyRepository
+import com.example.dairyledger.data.SettingsRepository
+import com.example.dairyledger.models.CollectViewModel
+import com.example.dairyledger.models.CurrentWeekViewModel
+import com.example.dairyledger.models.FarmerDetailsViewModel
+import com.example.dairyledger.models.FarmersViewModel
+import com.example.dairyledger.models.HomeViewModel
+import com.example.dairyledger.models.ReportsViewModel
+import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.models.SettingsViewModelFactory
+import com.example.dairyledger.models.ViewModelFactory
+import com.example.dairyledger.models.WeeklyArchiveViewModel
 import com.example.dairyledger.ui.theme.DairyLedgerTheme
 import com.example.dairyledger.views.AddFarmerScreen
 import com.example.dairyledger.views.CollectScreen
@@ -29,12 +44,15 @@ import com.example.dairyledger.views.WeekClosingScreen
 import com.example.dairyledger.views.WeeklyArchiveScreen
 
 class MainActivity : ComponentActivity() {
+    val repository by lazy { (application as DairyLedgerApp).repository }
+    val settingsRepository by lazy { (application as DairyLedgerApp).settingsRepository }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DairyLedgerTheme {
-                DairyApp()
+                DairyApp(repository, settingsRepository)
             }
         }
     }
@@ -43,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun DairyApp() {
+fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository) {
     val navController = rememberNavController()
 
     val navigateTab = { route: String ->
@@ -99,32 +117,97 @@ fun DairyApp() {
             startDestination = NavItem.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(NavItem.Home.route) { HomeScreen(navController, navigator) }
+            composable(NavItem.Home.route) {
+                val navBackStackEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+
+                val settingVM: SettingsViewModel = viewModel(
+                    viewModelStoreOwner = navBackStackEntry,
+                    factory = SettingsViewModelFactory(settingsRepository)
+                )
+                val vm: HomeViewModel = viewModel(factory = ViewModelFactory(repository))
+
+                HomeScreen(navController, navigator, vm, settingVM)
+            }
+
             composable(NavItem.Collect.route,
                 arguments = listOf(navArgument("type") { type = NavType.StringType })
             ) {
+                val vm: CollectViewModel = viewModel(factory = ViewModelFactory(repository))
                 val type = it.arguments?.getString("type") ?: "default"
-                CollectScreen(type, navigator)
+                CollectScreen(type, navigator, vm)
             }
-            composable(NavItem.Reports.route,
-                arguments = listOf(navArgument("weekId") { type = NavType.IntType })
-            ) {
-                val weekId = it.arguments?.getInt("weekId") ?: -1
-                ReportsScreen(weekId)
-            }
-            composable(NavItem.Farmers.route) { FarmersScreen(navigator) }
-            composable(NavItem.WeeklyArchive.route) { WeeklyArchiveScreen(navigator) }
-            composable(NavItem.Settings.route) { SettingsScreen() }
-            composable(NavItem.AddFarmer.route) { AddFarmerScreen(navigator) }
 
+            composable(NavItem.Reports.route,
+                arguments = listOf(navArgument("weekId") { type = NavType.LongType })
+            ) {
+                // Fetch the shared SettingsViewModel using the Home route's lifecycle
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val settingVM: SettingsViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = SettingsViewModelFactory(settingsRepository)
+                )
+
+                val vm: ReportsViewModel = viewModel(factory = ViewModelFactory(repository))
+                val weekId = it.arguments?.getLong("weekId") ?: -1
+                LaunchedEffect(weekId) { vm.loadWeek(weekId) }
+                ReportsScreen(vm, settingVM)
+            }
+
+            composable(NavItem.Farmers.route) {
+                // Farmers is the main entry point for the farmers' flow
+                val vm: FarmersViewModel = viewModel(factory = ViewModelFactory(repository))
+                FarmersScreen(navigator, vm)
+            }
+
+            composable(NavItem.WeeklyArchive.route) {
+                val vm: WeeklyArchiveViewModel = viewModel(factory = ViewModelFactory(repository))
+                WeeklyArchiveScreen(navigator, vm)
+            }
+
+            composable(NavItem.Settings.route) {
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val settingVM: SettingsViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = SettingsViewModelFactory(settingsRepository)
+                )
+                SettingsScreen(settingVM)
+            }
+
+            composable(NavItem.AddFarmer.route) {
+                // Fetch the identical FarmersViewModel from the Farmers destination backstack entry
+                val farmersEntry = remember(it) { navController.getBackStackEntry(NavItem.Farmers.route) }
+                val vm: FarmersViewModel = viewModel(
+                    viewModelStoreOwner = farmersEntry,
+                    factory = ViewModelFactory(repository)
+                )
+                AddFarmerScreen(navigator, vm)
+            }
 
             composable(NavItem.FarmerDetails.route,
-                arguments = listOf(navArgument("farmerId") { type = NavType.IntType })
-                ) {
-                val farmerId = it.arguments?.getInt("farmerId") ?: 0
-                FarmerDetailsScreen(farmerId, navigator)
+                arguments = listOf(navArgument("farmerId") { type = NavType.LongType })
+            ) {
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val settingVM: SettingsViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = SettingsViewModelFactory(settingsRepository)
+                )
+
+                val detailVM: FarmerDetailsViewModel = viewModel(factory = ViewModelFactory(repository))
+                val farmerId = it.arguments?.getLong("farmerId") ?: 0
+                LaunchedEffect(farmerId) { detailVM.loadFarmer(farmerId) }
+
+                FarmerDetailsScreen(navigator, detailVM, settingVM)
             }
-            composable(NavItem.WeekClosing.route) { WeekClosingScreen(navigator) }
+
+            composable(NavItem.WeekClosing.route) {
+                val vm: CurrentWeekViewModel = viewModel(factory = ViewModelFactory(repository))
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val settingVM: SettingsViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = SettingsViewModelFactory(settingsRepository)
+                )
+                WeekClosingScreen(navigator, vm, settingVM)
+            }
         }
     }
 }
