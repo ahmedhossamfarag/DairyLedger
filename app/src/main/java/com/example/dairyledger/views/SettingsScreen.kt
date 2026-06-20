@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,8 +32,8 @@ import java.text.DecimalFormat
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
-    val profileTitle: String = "System Configuration"
-    val profileSubtitle: String = "Manage application preferences"
+    val profileTitle = "System Configuration"
+    val profileSubtitle = "Manage application preferences"
     val onSaveConfigClick: (Double) -> Unit = { unitPrice -> settingsViewModel.setDefaultPrice(unitPrice) }
     val onResetDefaultsClick: () -> Unit = {}
 
@@ -65,7 +64,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 
     // Component Interaction States
     val defaultPrice by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
-    var unitPrice by remember { mutableStateOf(defaultPrice) }
+    var unitPrice by remember { mutableDoubleStateOf(defaultPrice) }
     var resetDay by remember { mutableStateOf("Friday Evening") }
     var selectedCurrency by remember { mutableStateOf("EGP") }
 

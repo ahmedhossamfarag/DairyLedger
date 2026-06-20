@@ -16,6 +16,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 import android.graphics.Color as AndroidColor
+import androidx.core.graphics.toColorInt
 
 
 /**
@@ -104,7 +105,7 @@ object PdfReportExporter {
             isFakeBoldText = true
             isAntiAlias = true
         }
-        val headerBgPaint = Paint().apply { color = AndroidColor.parseColor("#2D2D2D") }
+        val headerBgPaint = Paint().apply { color = "#2D2D2D".toColorInt() }
         val headerTextPaint = Paint().apply {
             color = AndroidColor.WHITE
             textSize = 12f
@@ -112,13 +113,13 @@ object PdfReportExporter {
             isAntiAlias = true
         }
         val cellTextPaint = Paint().apply {
-            color = AndroidColor.parseColor("#222222")
+            color = "#222222".toColorInt()
             textSize = 12f
             isAntiAlias = true
         }
-        val rowBgEvenPaint = Paint().apply { color = AndroidColor.parseColor("#F7F7F7") }
+        val rowBgEvenPaint = Paint().apply { color = "#F7F7F7".toColorInt() }
         val borderPaint = Paint().apply {
-            color = AndroidColor.parseColor("#DDDDDD")
+            color = "#DDDDDD".toColorInt()
             style = Paint.Style.STROKE
             strokeWidth = 1f
         }
@@ -145,7 +146,7 @@ object PdfReportExporter {
             canvas.drawRect(MARGIN, y, MARGIN + contentWidth, y + HEADER_ROW_HEIGHT, headerBgPaint)
             headers.forEachIndexed { i, label ->
                 canvas.drawText(label, x + 8f, y + HEADER_ROW_HEIGHT / 2 + 4f, headerTextPaint)
-                x += colWidths[i].toFloat()
+                x += colWidths[i]
             }
             y += HEADER_ROW_HEIGHT
         }
@@ -185,15 +186,15 @@ object PdfReportExporter {
             canvas.drawCircle(avatarCx, avatarCy, AVATAR_RADIUS, avatarPaint)
             canvas.drawText(item.initials, avatarCx, avatarCy + 3f, avatarTextPaint)
             canvas.drawText(item.name, avatarCx + AVATAR_RADIUS + 8f, midY, cellTextPaint)
-            x += colWidths[0].toFloat()
+            x += colWidths[0]
 
             // Column 1: liters
             canvas.drawText(item.liters, x + 8f, midY, cellTextPaint)
-            x += colWidths[1].toFloat()
+            x += colWidths[1]
 
             // Column 2: price per liter
             canvas.drawText(item.pricePerL, x + 8f, midY, cellTextPaint)
-            x += colWidths[2].toFloat()
+            x += colWidths[2]
 
             // Column 3: total
             canvas.drawText(item.total, x + 8f, midY, cellTextPaint)
@@ -232,7 +233,7 @@ object PdfReportExporter {
             }
             try {
                 context.startActivity(intent)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Toast.makeText(context, "No app found to open PDF files.", Toast.LENGTH_LONG).show()
             }
         }

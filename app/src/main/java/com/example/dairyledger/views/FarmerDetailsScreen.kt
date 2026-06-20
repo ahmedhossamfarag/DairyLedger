@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,7 +27,6 @@ import com.example.dairyledger.models.FarmerDetailsViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
-import kotlin.text.toDoubleOrNull
 
 
 data class ShiftLogItem(
@@ -70,7 +68,6 @@ fun FarmerDetailsScreenContent(
     settingsViewModel: SettingsViewModel
 ) {
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
-    val dayFormatter = remember { java.text.SimpleDateFormat("EEE", java.util.Locale.ENGLISH) }
 
     val farmer = farmerDetailsViewModel.farmer!!
     val farmerCollections = farmerDetailsViewModel.collectionDetails
@@ -93,7 +90,7 @@ fun FarmerDetailsScreenContent(
     )
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
     val totalAmountDue: String = numberFormatter.format (cumulativeTotal.toDouble() * unitPrice)
-    val weeklyShiftLogs: List<ShiftLogItem> = remember(farmerCollections) { createShiftListOf(farmerCollections, numberFormatter, dayFormatter) }
+    val weeklyShiftLogs: List<ShiftLogItem> = remember(farmerCollections) { createShiftListOf(farmerCollections, numberFormatter) }
     val onBackClick: () -> Unit = { navigator.goback() }
 
     Scaffold(
@@ -534,7 +531,6 @@ private fun ToggleActiveButtons(active: Boolean, farmerDetailsViewModel: FarmerD
 private fun createShiftListOf(
     farmerCollections: List<FarmerCollectionDetail>,
     numberFormatter: DecimalFormat,
-    dayFormatter: java.text.SimpleDateFormat
 ) : List<ShiftLogItem> {
     // 1. Define the order of days you want to display
     val daysOfWeek = listOf("Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri")

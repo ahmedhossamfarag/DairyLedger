@@ -5,12 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -79,7 +75,7 @@ fun ReportsContent(
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
     val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
 
-    val weekTitle: String = "Week ${reportsViewModel.week?.id}"
+    val weekTitle = "Week ${reportsViewModel.week?.id}"
     val dateRange: String = reportsViewModel.week?.let { week ->
         val calendar = Calendar.getInstance()
         calendar.time = week.startDate
