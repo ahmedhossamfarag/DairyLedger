@@ -48,3 +48,5 @@ val WarningText = Color(0xFFC62828)
 
 
 val ArchiveIconBg = Color(0xFFEFEBE9)     // subtle tray icon background
+
+val InactiveBrown = Color(0xFF5D4037)

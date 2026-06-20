@@ -14,9 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.data.Farmer
 import com.example.dairyledger.models.FarmersViewModel
 
 
@@ -24,11 +26,38 @@ import com.example.dairyledger.models.FarmersViewModel
 fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     val routeLabel = "Register a new producer to the collection route #42."
     val onCancelClick: () -> Unit = { navigator.gotoFarmers() }
-    val onSaveFarmerClick: (name: String, phone: String, address: String, notes: String) -> Unit = { _, _, _, _ ->  navigator.gotoFarmers() }
+    val onSaveFarmerClick: (name: String, phone: String, notes: String) -> Unit = {
+        name, phone, notes -> farmersViewModel.addFarmer(
+        Farmer(
+            -1,
+            name,
+            phone,
+            notes
+        )
+    )
+    }
+
+    val context = LocalContext.current // Get the context
+
+    LaunchedEffect(Unit) {
+        farmersViewModel.events.collect { event ->
+            when (event) {
+                is FarmersViewModel.UiEvent.FarmerAdded -> {
+                    navigator.gotoFarmers()
+                }
+                is FarmersViewModel.UiEvent.Error -> {
+                    android.widget.Toast.makeText(
+                        context,
+                        event.message,
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
 
     var farmerName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var farmAddress by remember { mutableStateOf("") }
     var additionalNotes by remember { mutableStateOf("") }
 
     Scaffold(
@@ -164,7 +193,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 }
 
                 Button(
-                    onClick = { onSaveFarmerClick(farmerName, phoneNumber, farmAddress, additionalNotes) },
+                    onClick = { onSaveFarmerClick(farmerName, phoneNumber, additionalNotes) },
                     modifier = Modifier
                         .weight(1f)
                         .height(50.dp),

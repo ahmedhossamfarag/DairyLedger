@@ -21,10 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.data.CollectionType
+import com.example.dairyledger.data.FarmerCollectionDetail
 import com.example.dairyledger.models.FarmerDetailsViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import java.text.DecimalFormat
-import java.util.Locale
+import kotlin.text.toDoubleOrNull
 
 
 data class ShiftLogItem(
@@ -40,25 +42,56 @@ fun FarmerDetailsScreen(
     farmerDetailsViewModel: FarmerDetailsViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val farmer = farmerDetailsViewModel.farmer
 
-    val farmerName: String = "Ahmed Hassan"
-    val phone: String = "0123456789"
-    val idNumber: String = "${farmerDetailsViewModel.farmerId}"
-    val statusLabel: String = "Active"
-    val morningTotal: String = "78"
-    val eveningTotal: String = "74"
-    val cumulativeTotal: String = "152"
+    if (farmer == null) {
+        Scaffold(
+            containerColor = ScreenBg,
+            topBar = {
+                FarmerDetailsTopBar(
+                    title = "Loading...",
+                    onBackClick = { navigator.goback() },
+                )
+            },
+        ) { innerPadding ->
+            NoContentPlaceHolder(modifier = Modifier.padding(innerPadding))
+        }
+    } else {
+        FarmerDetailsScreenContent(navigator, farmerDetailsViewModel, settingsViewModel)
+    }
+
+}
+@Composable
+fun FarmerDetailsScreenContent(
+    navigator: Navigator,
+    farmerDetailsViewModel: FarmerDetailsViewModel,
+    settingsViewModel: SettingsViewModel
+) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val dayFormatter = remember { java.text.SimpleDateFormat("EEE", java.util.Locale.ENGLISH) }
+
+    val farmer = farmerDetailsViewModel.farmer!!
+    val farmerCollections = farmerDetailsViewModel.collectionDetails
+    val farmerName: String = farmer.name
+    val phone: String = farmer.phone
+    val idNumber: String = farmerDetailsViewModel.farmerId.toString()
+    val statusLabel: String = if (farmer.active) "Active" else "Inactive"
+    val morningTotal: String = numberFormatter.format(
+        farmerCollections
+        .filter { it.type == CollectionType.MORNING }
+        .sumOf { it.value.toDouble() }
+    )
+    val eveningTotal: String = numberFormatter.format(
+        farmerCollections
+        .filter { it.type == CollectionType.EVENING }
+        .sumOf { it.value.toDouble() }
+    )
+    val cumulativeTotal: String = numberFormatter.format(
+        farmerCollections.sumOf { it.value.toDouble() }
+    )
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
     val totalAmountDue: String = numberFormatter.format (cumulativeTotal.toDouble() * unitPrice)
-    val weeklyShiftLogs: List<ShiftLogItem> = listOf(
-        ShiftLogItem("Mon", "12.5 L", "11.0 L"),
-        ShiftLogItem("Tue", "13.0 L", "10.5 L"),
-        ShiftLogItem("Wed", "11.2 L", "12.0 L"),
-        ShiftLogItem("Thu", "14.1 L", "11.8 L"),
-        ShiftLogItem("Fri", "13.2 L", "14.1 L"),
-        ShiftLogItem("Sat", "14.0 L", "14.6 L")
-    )
+    val weeklyShiftLogs: List<ShiftLogItem> = remember(farmerCollections) { createShiftListOf(farmerCollections, numberFormatter, dayFormatter) }
     val onBackClick: () -> Unit = { navigator.goback() }
 
     Scaffold(
@@ -84,6 +117,7 @@ fun FarmerDetailsScreen(
                 name = farmerName,
                 phone = phone,
                 idNumber = idNumber,
+                active = farmer.active,
                 status = statusLabel
             )
 
@@ -128,6 +162,10 @@ fun FarmerDetailsScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            ToggleActiveButtons(active = farmer.active, farmerDetailsViewModel)
+
+            Spacer(Modifier.height(16.dp))
+
             // Bottom Batch Premium Alert Status Accent Strip
             PremiumQualityBatchAlertCard()
 
@@ -168,7 +206,7 @@ private fun FarmerDetailsTopBar(
 }
 
 @Composable
-private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: String, status: String) {
+private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: String, active: Boolean, status: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -242,7 +280,7 @@ private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: Str
                 ) {
                     Text("STATUS", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
                     Spacer(Modifier.height(2.dp))
-                    Text(status, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
+                    Text(status, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (active) DairyGreen else InactiveBrown)
                 }
             }
         }
@@ -457,4 +495,74 @@ private fun PremiumQualityBatchAlertCard() {
             }
         }
     }
+}
+
+
+@Composable
+private fun ToggleActiveButtons(active: Boolean, farmerDetailsViewModel: FarmerDetailsViewModel){
+    Button(
+        onClick = {
+            if (active) {
+                farmerDetailsViewModel.setInactive()
+            } else {
+                farmerDetailsViewModel.setActive()
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(54.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = if (active) MutedText else DairyGreen)
+    ) {
+        Icon(
+            imageVector = if (active) Icons.Filled.Close else Icons.Filled.Check,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = if (active) "Deactivate" else "Activate",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+    }
+}
+private fun createShiftListOf(
+    farmerCollections: List<FarmerCollectionDetail>,
+    numberFormatter: DecimalFormat,
+    dayFormatter: java.text.SimpleDateFormat
+) : List<ShiftLogItem> {
+    // 1. Define the order of days you want to display
+    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+    // 2. Process the collections list
+    val weeklyShiftLogs: List<ShiftLogItem> = run {
+        // Group collections by day ("Mon", "Tue", etc.)
+        val groupedByDay = farmerCollections.groupBy { dayFormatter.format(it.timestamp) }
+
+        daysOfWeek.map { day ->
+            val collectionsForDay = groupedByDay[day] ?: emptyList()
+
+            // Sum morning values
+            val morningSum = collectionsForDay
+                .filter { it.type == CollectionType.MORNING }
+                .sumOf { it.value.toDouble() }
+
+            // Sum evening values
+            val eveningSum = collectionsForDay
+                .filter { it.type == CollectionType.EVENING }
+                .sumOf { it.value.toDouble() }
+
+            ShiftLogItem(
+                dayLabel = day,
+                // Format to 1 decimal place or use your numberFormatter
+                morningAmount = if (morningSum > 0) "${numberFormatter.format(morningSum)} L" else "0.0 L",
+                eveningAmount = if (eveningSum > 0) "${numberFormatter.format(eveningSum)} L" else "0.0 L"
+            )
+        }
+    }
+
+    return weeklyShiftLogs
 }

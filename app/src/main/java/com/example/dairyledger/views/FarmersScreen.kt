@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.FarmersViewModel
 
 data class FarmerListItem(
-    val id: Int,
+    val id: Long,
     val name: String,
     val phone: String,
     val initials: String,
@@ -31,14 +31,14 @@ data class FarmerListItem(
 
 @Composable
 fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
-    val farmersCount: Int = 24
-    val farmersList: List<FarmerListItem> = listOf(
-        FarmerListItem(1, "Ahmed Hassan", "0123456789", "AH"),
-        FarmerListItem(2, "Mariya Sameer", "0987654321", "MS"),
-        FarmerListItem(3, "Khalid Ibrahim", "0123456789", "KI"),
-        FarmerListItem(4, "Zoya Fatima", "0987654321",  "ZF"),
-        FarmerListItem(5, "Omar Farooq", "0123456789",  "OF")
-    )
+    val farmersCount: Int = farmersViewModel.farmers.size
+    val farmersList: List<FarmerListItem> = farmersViewModel.farmers.map { FarmerListItem(
+        id = it.id,
+        name = it.name,
+        phone = it.phone,
+        initials = it.name.take(2).uppercase(),
+        active = it.active
+    ) }
     val onFarmerCardClick: (Int) -> Unit = { farmerId -> navigator.gotoFarmerDetails(farmerId)}
     val onAddFarmerClick: () -> Unit = { navigator.gotoAddFarmer() }
 
@@ -130,18 +130,22 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 }
             }
 
-            // Farmers List Block
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                farmersList.forEach { farmer ->
-                    FarmerCardRow(farmer = farmer, onFarmerCardClick = onFarmerCardClick)
+            if (farmersList.isEmpty()){
+                NoContentPlaceHolder()
+            } else {
+                // Farmers List Block
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    farmersList.forEach { farmer ->
+                        FarmerCardRow(farmer = farmer, onFarmerCardClick = onFarmerCardClick)
+                    }
+                    Spacer(Modifier.height(80.dp)) // Extra layout padding for FAB overlap
                 }
-                Spacer(Modifier.height(80.dp)) // Extra layout padding for FAB overlap
             }
         }
     }
@@ -247,7 +251,7 @@ private fun FarmerCardRow(farmer: FarmerListItem, onFarmerCardClick: (Int) -> Un
                     text = if (farmer.active) "ACTIVE" else "INACTIVE",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = ValueGreen
+                    color = if (farmer.active) ValueGreen else InactiveBrown
                 )
             }
         }
