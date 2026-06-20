@@ -25,10 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.dairyledger.data.CollectionType
 import com.example.dairyledger.models.HomeViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 
@@ -46,20 +49,66 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
-
-    val weekLabel: String = "Week 23 (Jun 10 - Jun 16)"
-    val morning: CollectionStatus = CollectionStatus("Morning\nCollection", true, "350", 24)
-    val evening: CollectionStatus = CollectionStatus("Evening\nCollection", false, "290", 24)
-    val weeklyTotalLiters: String = "4,830"
-    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
     val agentName: String = "Collection Agent"
     val appVersion: String = "App Version 2.4.1 (Stable)"
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    if (homeViewModel.currentWeek == null) {
+        val onStartNewClick: () -> Unit = { homeViewModel.createNewWeek() }
+
+        ModalNavigationDrawer(drawerState = drawerState,
+            drawerContent = {
+                AppDrawerContent(
+                    agentName = agentName,
+                    appVersion = appVersion,
+                    navController = navController,
+                )
+            }) {
+            Scaffold(
+                containerColor = ScreenBg,
+                topBar = {
+                    DairyTopBar(
+                        onMenuClick = { scope.launch { drawerState.open() } },
+                    )
+                },
+                floatingActionButton = { StartNewFloatingButton(onStartNewClick = onStartNewClick) }
+            ) { innerPadding ->
+                NoContentPlaceHolder(
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+        }
+
+        return
+    }
+
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val dateFormatter = remember { SimpleDateFormat("MMM dd", Locale.ENGLISH) }
+
+    val weekLabel: String = homeViewModel.currentWeek?.let { week ->
+        val calendar = Calendar.getInstance()
+        calendar.time = week.startDate
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        val endDate = calendar.time
+
+        "Week ${week.id} (${dateFormatter.format(week.startDate)} - ${dateFormatter.format(endDate)})"
+    } ?: ""
+    val morning: CollectionStatus = homeViewModel.todayCollectionSummary
+        .find { it.type == CollectionType.MORNING }
+        ?.let { CollectionStatus("Morning\nCollection", true, numberFormatter.format(it.totalAmount), it.farmerCount) }
+        ?: CollectionStatus("Morning\nCollection", false, "0", 0)
+    val evening: CollectionStatus = homeViewModel.todayCollectionSummary
+        .find { it.type == CollectionType.EVENING }
+        ?.let { CollectionStatus("Evening\nCollection", true, numberFormatter.format(it.totalAmount), it.farmerCount) }
+        ?: CollectionStatus("Evening\nCollection", false, "0", 0)
+    val weeklyTotalLiters: String = numberFormatter.format(homeViewModel.currentWeekTotal)
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+
     val onMorningCollectionClick: () -> Unit = { navigator.gotoCollectWithType("morning") }
     val onEveningCollectionClick: () -> Unit = { navigator.gotoCollectWithType("evening") }
     val onViewWeeklyReportClick: () -> Unit = { navigator.gotoReports() }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -423,3 +472,29 @@ private fun SecondaryButton(text: String, icon: ImageVector, onClick: () -> Unit
     }
 }
 
+
+@Composable
+private fun StartNewFloatingButton(onStartNewClick: () -> Unit) {
+    val text = "Start New Week"
+
+    FloatingActionButton(
+        onClick = onStartNewClick,
+        containerColor = DairyGreen,
+        contentColor = Color.White,
+        shape = RoundedCornerShape(50),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.AddCircle,
+                contentDescription = text,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(text = text, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = Color.White)
+
+        }
+    }
+}

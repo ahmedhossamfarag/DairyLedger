@@ -103,8 +103,8 @@ class DairyRepository(context: Context) {
     // (Total Dairies amount, and Count of Farmers)
     // ============================================================
 
-    suspend fun getCurrentWeekTodaysCollectionSummary(): TodayCollectionSummary? {
-        val week = currentWeekOrNull() ?: return null
+    suspend fun getCurrentWeekTodaysCollectionSummary(): List<TodayCollectionSummary> {
+        val week = currentWeekOrNull() ?: return emptyList()
         val (start, end) = todayRange()
         return dairyDao.getTodayCollectionSummary(week.id, start, end)
     }

@@ -19,7 +19,7 @@ class HomeViewModel(
         private set
     var currentWeekTotal by mutableFloatStateOf(0.0f)
         private set
-    var todayCollectionSummary by mutableStateOf<TodayCollectionSummary?>(null)
+    var todayCollectionSummary by mutableStateOf<List<TodayCollectionSummary>>(emptyList())
         private set
 
     init {

@@ -206,13 +206,14 @@ interface DairyDao {
         INNER JOIN collection c ON d.collectionId = c.id
         WHERE c.weekId = :weekId
         AND c.timestamp >= :dayStart AND c.timestamp < :dayEnd
+        GROUP BY c.id
         """
     )
     suspend fun getTodayCollectionSummary(
         weekId: Long,
         dayStart: Date,
         dayEnd: Date
-    ): TodayCollectionSummary
+    ): List<TodayCollectionSummary>
 
     // ---------- Current week total dairies amount ----------
     @Query(

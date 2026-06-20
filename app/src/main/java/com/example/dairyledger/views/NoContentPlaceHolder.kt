@@ -1,8 +1,12 @@
+package com.example.dairyledger.views
+
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.example.dairyledger.R
 
 @Composable
-fun Placeholder(
+fun NoContentPlaceHolder(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -27,6 +31,7 @@ fun Placeholder(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(ScreenBg)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -34,7 +39,7 @@ fun Placeholder(
             Image(
                 painter = painterResource(id = R.drawable.ic_empty_box),
                 contentDescription = "No data available illustration",
-                modifier = Modifier.size(240.dp)
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
