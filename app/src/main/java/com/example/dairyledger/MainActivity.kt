@@ -150,7 +150,7 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
                 val vm: ReportsViewModel = viewModel(factory = ViewModelFactory(repository))
                 val weekId = it.arguments?.getLong("weekId") ?: -1
                 LaunchedEffect(weekId) { vm.loadWeek(weekId) }
-                ReportsScreen(vm, settingVM)
+                ReportsScreen(navigator, vm, settingVM)
             }
 
             composable(NavItem.Farmers.route) {

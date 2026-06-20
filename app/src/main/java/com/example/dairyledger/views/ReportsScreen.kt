@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
-import java.util.Locale
+import java.util.Calendar
 
 
 data class ReportRowItem(
@@ -38,25 +38,11 @@ data class ReportRowItem(
 
 @Composable
 fun ReportsScreen(
+    navigator: Navigator,
     reportsViewModel: ReportsViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
-
-    val weekTitle: String = "Week ${reportsViewModel.weekId}"
-    val dateRange: String = "June 10 - June 16, 2024"
-    val totalMilk: Double = 4830.0
-    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
-    val totalRevenue: String = numberFormatter.format(unitPrice * totalMilk)
-    val reportData: List<ReportRowItem> = listOf(
-        ReportRowItem("#8821", "Rajesh Meena", "RM", "420.5", "$0.45", "$189.22", Color(0xFF2E7D32)),
-        ReportRowItem("#8822", "Anita Sharma", "AS", "390.0", "$0.45", "$175.50", Color(0xFFB0BEC5)),
-        ReportRowItem("#8823", "Suresh Kumar", "SK", "512.2", "$0.45", "$230.49", Color(0xFFFFB300)),
-        ReportRowItem("#8824", "Dinesh Patel", "DP", "315.0", "$0.45", "$141.75", Color(0xFF1B5E20)),
-        ReportRowItem("#8825", "Priya Pawar", "PP", "488.3", "$0.45", "$219.73", Color(0xFFCFD8DC))
-    )
-    val onExportPdfClick: () -> Unit = {}
-    val isCurrentWeek = true
+    val week = reportsViewModel.week
 
     Scaffold(
         containerColor = ScreenBg,
@@ -64,10 +50,59 @@ fun ReportsScreen(
             ReportsTopBar()
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
+        if (week == null) {
+            NoContentPlaceHolder(modifier = Modifier.padding(innerPadding))
+        } else {
+            ReportsContent(
+                modifier = Modifier.padding(innerPadding),
+                navigator,
+                reportsViewModel,
+                settingsViewModel
+            )
+        }
+    }
+
+}
+
+@Composable
+fun ReportsContent(
+    modifier: Modifier = Modifier,
+    navigator: Navigator,
+    reportsViewModel: ReportsViewModel,
+    settingsViewModel: SettingsViewModel
+) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
+
+    val weekTitle: String = "Week ${reportsViewModel.week?.id}"
+    val dateRange: String = reportsViewModel.week?.let { week ->
+        val calendar = Calendar.getInstance()
+        calendar.time = week.startDate
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        val endDate = calendar.time
+
+        "Week ${week.id} (${dayFormatter.format(week.startDate)} - ${dayFormatter.format(endDate)})"
+    } ?: ""
+    val totalMilk: Double = reportsViewModel.farmerWeekTotal.sumOf { it.total.toDouble() }
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    val totalRevenue: String = numberFormatter.format(unitPrice * totalMilk)
+    val reportData: List<ReportRowItem> = reportsViewModel.farmerWeekTotal.map { farmerWeekTotal ->
+        ReportRowItem(
+            id = farmerWeekTotal.farmerId.toString(),
+            name = farmerWeekTotal.farmerName,
+            initials = farmerWeekTotal.farmerName.first().toString(),
+            liters = numberFormatter.format(farmerWeekTotal.total),
+            pricePerL = numberFormatter.format(unitPrice),
+            total = numberFormatter.format(farmerWeekTotal.total * unitPrice)
+        )
+    }
+    val onExportPdfClick: () -> Unit = {}
+    val onCloseWeek: () -> Unit = { navigator.gotoWeekClosing() }
+    val isCurrentWeek = reportsViewModel.weekId == -1L
+
+    Column(
+            modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
             // Header Section
@@ -163,7 +198,28 @@ fun ReportsScreen(
             }
 
             Spacer(Modifier.height(32.dp))
-        }
+
+            if (isCurrentWeek) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = onCloseWeek,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MutedText)
+                    ) {
+                        Icon(imageVector = Icons.Outlined.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = "Close Week", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
     }
 }
 
@@ -255,22 +311,7 @@ private fun DetailedReportTable(reportData: List<ReportRowItem>, totalMilk: Stri
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Name and Avatar column
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(2f)) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(row.avatarBgColor),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = row.initials, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text(text = row.name, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = TextDark)
-                            Text(text = "ID: ${row.id}", fontSize = 11.sp, color = MutedText)
-                        }
-                    }
+                    Text(text = row.name, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = TextDark)
                     Text(text = row.liters, fontSize = 13.sp, color = TextDark, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
                     Text(text = row.pricePerL, fontSize = 13.sp, color = MutedText, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
                     Text(text = row.total, fontSize = 13.sp, color = DairyGreen, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1.2f))

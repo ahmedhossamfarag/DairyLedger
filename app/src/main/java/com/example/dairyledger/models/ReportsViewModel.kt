@@ -42,7 +42,7 @@ class ReportsViewModel(
             }
 
             if (week != null) {
-                farmerWeekTotal = repository.getWeekFarmerTotals(weekId)
+                farmerWeekTotal = repository.getWeekFarmerTotals(week!!.id)
             }
         }
     }

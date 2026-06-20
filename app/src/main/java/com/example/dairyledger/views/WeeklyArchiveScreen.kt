@@ -18,7 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.data.WeekTotal
 import com.example.dairyledger.models.WeeklyArchiveViewModel
+import java.util.Calendar
 
 
 data class FeaturedArchive(
@@ -37,85 +39,130 @@ data class WeeklyArchiveItem(
 
 @Composable
 fun WeeklyArchiveScreen(navigator: Navigator, weekArchiveViewModel: WeeklyArchiveViewModel) {
-    val featuredArchive: FeaturedArchive = FeaturedArchive("WEEK 22", "Jun 03 - Jun 09, 2024", "4,720", 42)
-    val recentArchives: List<WeeklyArchiveItem> = listOf(
-        WeeklyArchiveItem(1, "Week 21", "May 27 - Jun 02", "4,680"),
-        WeeklyArchiveItem(2, "Week 20", "May 20 - May 26", "4,595"),
-        WeeklyArchiveItem(3, "Week 19", "May 13 - May 19", "4,810"),
-        WeeklyArchiveItem(4, "Week 18", "May 06 - May 12", "4,420")
-    )
-    val onViewReportClick: () -> Unit = { navigator.gotoReports() }
-    val onCardClick: (Int) -> Unit = { id -> navigator.gotoWeekReport(id) }
-    val onLoadOlderClick: () -> Unit = {}
-
     Scaffold(
         containerColor = ScreenBg,
         topBar = {
             ArchiveTopBar()
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-        ) {
-            Spacer(Modifier.height(12.dp))
-
-            // Header Row Section with Filter Action
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column {
-                    Text(
-                        text = "Weekly Archive",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextDark
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Historical milk collection records",
-                        fontSize = 14.sp,
-                        color = MutedText
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Highlighted Featured Week Panel
-            FeaturedCard(data = featuredArchive, onViewReportClick = onViewReportClick)
-
-            Spacer(Modifier.height(20.dp))
-
-            // Main Core Archive Stack
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                recentArchives.forEach { archive ->
-                    WeeklyArchiveRowCard(item = archive, onCardClick = onCardClick)
-                }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Paginated Load More Button Action Anchor
-            Button(
-                onClick = onLoadOlderClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(horizontal = 40.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
-            ) {
-                Text(text = "Load Older Archives", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            }
-
-            Spacer(Modifier.height(32.dp))
+        if (weekArchiveViewModel.weeks.isEmpty()) {
+            NoContentPlaceHolder(modifier = Modifier.padding(innerPadding))
+        } else {
+            WeeklyArchiveContent(
+                modifier = Modifier.padding(innerPadding),
+                navigator,
+                weekArchiveViewModel
+            )
         }
+    }
+}
+
+@Composable
+fun WeeklyArchiveContent(
+    modifier: Modifier,
+    navigator: Navigator,
+    weekArchiveViewModel: WeeklyArchiveViewModel
+) {
+    val numberFormatter = remember { java.text.DecimalFormat("#,##0.00") }
+    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
+
+    val weeks = weekArchiveViewModel.weeks
+    val activeFarmers = weekArchiveViewModel.activeFarmersCount
+
+    val dateRange: (WeekTotal) -> String = remember(dayFormatter) {
+        { week ->
+            val calendar = Calendar.getInstance()
+            calendar.time = week.startDate
+            val startPart = dayFormatter.format(week.startDate)
+
+            // Add 7 days to get the end date
+            calendar.add(Calendar.DAY_OF_YEAR, 7)
+            val endPart = dayFormatter.format(calendar.time)
+
+            "$startPart - $endPart"
+        }
+    }
+
+    val featuredArchive: FeaturedArchive =  weeks.first().let {
+        FeaturedArchive(
+            "WEEK ${it.weekId}",
+            dateRange(it),
+            numberFormatter.format(it.total),
+            activeFarmers
+        )
+    }
+    val recentArchives: List<WeeklyArchiveItem> = weeks.drop(1).map {
+        WeeklyArchiveItem(
+            id = it.weekId.toInt(),
+            weekLabel = "WEEK ${it.weekId}",
+            dateRange = dateRange(it),
+            yield = numberFormatter.format(it.total)
+        )
+    }
+    val onViewReportClick: () -> Unit = { navigator.gotoReports() }
+    val onCardClick: (Int) -> Unit = { id -> navigator.gotoWeekReport(id) }
+    val onLoadOlderClick: () -> Unit = { weekArchiveViewModel.loadMore() }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
+    ) {
+        Spacer(Modifier.height(12.dp))
+
+        // Header Row Section with Filter Action
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column {
+                Text(
+                    text = "Weekly Archive",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Historical milk collection records",
+                    fontSize = 14.sp,
+                    color = MutedText
+                )
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Highlighted Featured Week Panel
+        FeaturedCard(data = featuredArchive, onViewReportClick = onViewReportClick)
+
+        Spacer(Modifier.height(20.dp))
+
+        // Main Core Archive Stack
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            recentArchives.forEach { archive ->
+                WeeklyArchiveRowCard(item = archive, onCardClick = onCardClick)
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // Paginated Load More Button Action Anchor
+        Button(
+            onClick = onLoadOlderClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .padding(horizontal = 40.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
+        ) {
+            Text(text = "Load Older Archives", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+
+        Spacer(Modifier.height(32.dp))
     }
 }
 

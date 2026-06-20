@@ -51,6 +51,7 @@ class CurrentWeekViewModel(
                 week = repository.currentWeekOrNull()
                 weekTotal = repository.getCurrentWeekTotal()
                 _events.emit(UiEvent.WeekClosed)
+                repository.notifyDataChanged()
             } catch (e: Exception) {
                 _events.emit(UiEvent.Error(e.message ?: "Failed to close week"))
             }

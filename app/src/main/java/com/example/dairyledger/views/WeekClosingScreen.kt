@@ -15,13 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.CurrentWeekViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import java.text.DecimalFormat
-import java.util.Locale
+import java.util.Calendar
 
 
 @Composable
@@ -30,105 +31,163 @@ fun WeekClosingScreen(
     currentWeekViewModel: CurrentWeekViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
-
-    val weekEndingLabel: String = "Week Ending Oct 27, 2023"
-    val totalMilkCollected: Double = 4830.0
-    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
-    val totalAmountCollected: String = numberFormatter.format(unitPrice * totalMilkCollected)
-    val onArchiveAndCloseClick: () -> Unit = { navigator.gotoHome() }
-    val onDownloadPdfFirstClick: () -> Unit = {}
-
+    val week = currentWeekViewModel.week
     Scaffold(
         containerColor = ScreenBg,
         topBar = {
             ClosingTopBar()
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-        ) {
-            Spacer(Modifier.height(12.dp))
-
-            // Section Header Block
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = weekEndingLabel,
-                    fontSize = 14.sp,
-                    color = MutedText,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = "Weekly Summary",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextDark
-                )
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Card 1: Total Milk Collected Summary (Primary Highlight Card)
-            PrimaryMetricHighlightCard(value = numberFormatter.format(totalMilkCollected))
-
-            Spacer(Modifier.height(14.dp))
-
-            // Card 2: Total Financial Payout Amount Summary
-            SecondaryMetricCard(
-                title = "Total Amount",
-                value = totalAmountCollected,
-                icon = Icons.Outlined.ShoppingCart
+        if (week == null) {
+            NoContentPlaceHolder(modifier = Modifier.padding(innerPadding))
+        } else {
+            WeekClosingContent(
+                modifier = Modifier.padding(innerPadding),
+                navigator,
+                currentWeekViewModel,
+                settingsViewModel
             )
+        }
+    }
+}
 
-            Spacer(Modifier.height(20.dp))
+@Composable
+fun WeekClosingContent(
+   modifier: Modifier,
+   navigator: Navigator,
+   currentWeekViewModel: CurrentWeekViewModel,
+   settingsViewModel: SettingsViewModel
+) {
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val dayFormatter = remember { java.text.SimpleDateFormat("EEE, MMM dd", java.util.Locale.ENGLISH) }
 
-            // Core Warning System Notification Notice Panel Box
-            ImportantNoticeAlertCard()
+    val weekEndingLabel: String = currentWeekViewModel.week?.let { week ->
+        val calendar = Calendar.getInstance()
+        calendar.time = week.startDate
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        val endDate = calendar.time
 
-            Spacer(Modifier.height(24.dp))
+        "Week Ending ${dayFormatter.format(endDate)}"
+    } ?: ""
+    val totalMilkCollected: Double = currentWeekViewModel.weekTotal.toDouble()
+    val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
+    val totalAmountCollected: String = numberFormatter.format(unitPrice * totalMilkCollected)
+    val onArchiveAndCloseClick: () -> Unit = { currentWeekViewModel.closeWeek() }
+    val onDownloadPdfFirstClick: () -> Unit = {}
 
-            // Action Execution Button Control Architecture Block
-            Button(
-                onClick = onArchiveAndCloseClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.Outlined.Lock, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(text = "Archive & Start New Week", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        currentWeekViewModel.events.collect { event ->
+            when (event) {
+                is CurrentWeekViewModel.UiEvent.WeekClosed -> {
+                    navigator.goback()
+                }
+                is CurrentWeekViewModel.UiEvent.Error -> {
+                    android.widget.Toast.makeText(
+                        context,
+                        event.message,
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
                 }
             }
-
-            Spacer(Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = onDownloadPdfFirstClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(10.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextDark)
-            ) {
-                Text(text = "Download PDF Report First", fontSize = 15.sp, fontWeight = FontWeight.Medium)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // System Readiness Graphic/Visual Panel Section
-            SystemReadinessPanel()
-
-            Spacer(Modifier.height(32.dp))
         }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
+    ) {
+        Spacer(Modifier.height(12.dp))
+
+        // Section Header Block
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = weekEndingLabel,
+                fontSize = 14.sp,
+                color = MutedText,
+                fontWeight = FontWeight.Medium
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = "Weekly Summary",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextDark
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Card 1: Total Milk Collected Summary (Primary Highlight Card)
+        PrimaryMetricHighlightCard(value = numberFormatter.format(totalMilkCollected))
+
+        Spacer(Modifier.height(14.dp))
+
+        // Card 2: Total Financial Payout Amount Summary
+        SecondaryMetricCard(
+            title = "Total Amount",
+            value = totalAmountCollected,
+            icon = Icons.Outlined.ShoppingCart
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // Core Warning System Notification Notice Panel Box
+        ImportantNoticeAlertCard()
+
+        Spacer(Modifier.height(24.dp))
+
+        // Action Execution Button Control Architecture Block
+        Button(
+            onClick = onArchiveAndCloseClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Archive & Start New Week",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onDownloadPdfFirstClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(10.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextDark)
+        ) {
+            Text(
+                text = "Download PDF Report First",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // System Readiness Graphic/Visual Panel Section
+        SystemReadinessPanel()
+
+        Spacer(Modifier.height(32.dp))
     }
 }
 
