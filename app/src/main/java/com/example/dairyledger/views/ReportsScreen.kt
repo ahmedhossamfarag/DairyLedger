@@ -17,12 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.pdf.PdfReportExporter
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 
@@ -96,7 +99,14 @@ fun ReportsContent(
             total = numberFormatter.format(farmerWeekTotal.total * unitPrice)
         )
     }
-    val onExportPdfClick: () -> Unit = {}
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val onExportPdfClick: () -> Unit = {
+        scope.launch {
+            PdfReportExporter.exportAndOpen(context, reportData, title = "Week Report")
+        }
+    }
     val onCloseWeek: () -> Unit = { navigator.gotoWeekClosing() }
     val isCurrentWeek = reportsViewModel.weekId == -1L
 
