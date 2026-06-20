@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,6 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.CollectViewModel
+import java.text.DecimalFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 
@@ -36,24 +40,73 @@ data class FarmerCollectionState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectScreen(type: String = "default", navigator: Navigator, collectViewModel: CollectViewModel) {
-    val titleLabel = "$type Collection"
-    val dateLabel = "Monday, June 15"
-    val initialFarmers = listOf(
-        FarmerCollectionState("1", "Ahmed Hassan", 12.5, true),
-        FarmerCollectionState("2", "Fatima Zahra", 0.0, false),
-        FarmerCollectionState("3", "John Doe", 8.2, false),
-        FarmerCollectionState("4", "Ibrahim Malik", 15.0, false)
-    )
-    val onSaveCollectionClick: (Map<String, Double>) -> Unit = { navigator.gotoHome() }
+    val numberFormatter = remember { DecimalFormat("#,##0.00") }
+    val dayFormatter = remember { java.text.SimpleDateFormat("EEEE, MMMM d", Locale.ENGLISH) }
+
+    val collectionType =
+        if (type == "morning") "Morning"
+        else if (type == "evening") "Evening"
+        else if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 15) "Morning"
+        else "Evening"
+    val titleLabel = "$collectionType Collection"
+    val dateLabel = dayFormatter.format(Date())
+
+    val initialFarmers = collectViewModel.activeFarmers.map {
+        FarmerCollectionState(
+            id = it.id.toString(),
+            name = it.name,
+            initialLiters = 0.0,
+            isChecked = false
+        )
+    }
 
     var searchQuery by remember { mutableStateOf("") }
     
     // Track the liters input for each farmer dynamically
     val volumesState = remember { 
         mutableStateMapOf<String, String>().apply {
-            initialFarmers.forEach { this[it.id] = String.format(Locale.US, "%.1f", it.initialLiters) }
+            initialFarmers.forEach { this[it.id] = numberFormatter.format(it.initialLiters) }
         }
     }
+
+    var savingActive by remember { mutableStateOf(true) }
+
+    val onSaveCollectionClick: (Map<String, Double>) -> Unit = {
+        if (savingActive) {
+            savingActive = false
+
+            val finalData = volumesState.mapNotNull { (id, value) ->
+                val idInt = id.toIntOrNull()
+                val volumeDouble = value.toDoubleOrNull() ?: 0.0
+                if (idInt != null) idInt to volumeDouble else null
+            }.toMap()
+
+            collectViewModel.saveCollection(
+                collectionType.lowercase(),
+                finalData
+            )
+        }
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        collectViewModel.events.collect { event ->
+            when (event) {
+                is CollectViewModel.UiEvent.CollectionSaved -> {
+                    navigator.gotoHome()
+                }
+                is CollectViewModel.UiEvent.Error -> {
+                    android.widget.Toast.makeText(
+                        context,
+                        event.message,
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
 
     Scaffold(
         containerColor = ScreenBg,
@@ -64,91 +117,96 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(ScreenBg)
-                .padding(innerPadding)
-        ) {
-            // Search Bar Section
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
-                placeholder = { Text("Search Farmer", color = MutedText, fontSize = 15.sp) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Search",
-                        tint = MutedText
-                    )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedBorderColor = CardBorder,
-                    unfocusedBorderColor = CardBorder
-                )
-            )
-
-            // Scrollable Farmer List
+        if (initialFarmers.isEmpty()) {
+            NoContentPlaceHolder(modifier = Modifier.padding(innerPadding))
+        } else {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxSize()
+                    .background(ScreenBg)
+                    .padding(innerPadding)
             ) {
-                val filteredFarmers = initialFarmers.filter {
-                    it.name.contains(searchQuery, ignoreCase = true)
-                }
-
-                filteredFarmers.forEach { farmer ->
-                    val currentVolumeText = volumesState[farmer.id] ?: "0.0"
-                    
-                    FarmerCollectionCard(
-                        farmer = farmer,
-                        volumeText = currentVolumeText,
-                        onVolumeChange = { newValue -> volumesState[farmer.id] = newValue }
-                    )
-                }
-                
-                Spacer(Modifier.height(8.dp))
-
-                // Persistent Action Button at the base of the scrollable list
-                Button(
-                    onClick = {
-                        val finalData = initialFarmers.associate { 
-                            it.id to (volumesState[it.id]?.toDoubleOrNull() ?: 0.0) 
-                        }
-                        onSaveCollectionClick(finalData)
-                    },
+                // Search Bar Section
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp),
+                        .padding(horizontal = 20.dp, vertical = 12.dp),
+                    placeholder = { Text("Search Farmer", color = MutedText, fontSize = 15.sp) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search",
+                            tint = MutedText
+                        )
+                    },
+                    singleLine = true,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedBorderColor = CardBorder,
+                        unfocusedBorderColor = CardBorder
+                    )
+                )
+
+                // Scrollable Farmer List
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "Save Collection",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    val filteredFarmers = initialFarmers.filter {
+                        it.name.contains(searchQuery, ignoreCase = true)
+                    }
+
+                    filteredFarmers.forEach { farmer ->
+                        val currentVolumeText = volumesState[farmer.id] ?: "0.0"
+
+                        FarmerCollectionCard(
+                            farmer = farmer,
+                            volumeText = currentVolumeText,
+                            onVolumeChange = { newValue -> volumesState[farmer.id] = newValue }
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    // Persistent Action Button at the base of the scrollable list
+                    Button(
+                        onClick = {
+                            val finalData = initialFarmers.associate {
+                                it.id to (volumesState[it.id]?.toDoubleOrNull() ?: 0.0)
+                            }
+                            onSaveCollectionClick(finalData)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = savingActive,
+                        colors = ButtonDefaults.buttonColors(containerColor = DairyGreen, disabledContainerColor = MutedText)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Save Collection",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    Spacer(Modifier.height(24.dp))
                 }
-                
-                Spacer(Modifier.height(24.dp))
             }
         }
     }
@@ -271,7 +329,7 @@ private fun FarmerCollectionCard(
                         value = volumeText,
                         onValueChange = { input ->
                             // Sanitize keyboard input to match standard decimal structures cleanly
-                            if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
+                            if (input.isEmpty() || input.matches(Regex("^\\d*(\\.\\d{0,2})?$"))) {
                                 onVolumeChange(input)
                             }
                         },

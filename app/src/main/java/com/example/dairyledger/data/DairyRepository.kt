@@ -1,6 +1,8 @@
 package com.example.dairyledger.data
 
 import android.content.Context
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.util.Calendar
 import java.util.Date
 
@@ -157,5 +159,16 @@ class DairyRepository(context: Context) {
     suspend fun getFarmerCurrentWeekDairies(farmerId: Long): List<FarmerCollectionDetail> {
         val week = currentWeekOrNull() ?: return emptyList()
         return dairyDao.getFarmerDairiesForWeek(week.id, farmerId)
+    }
+
+    // ============================================================
+    // Refresh Trigger
+    // ============================================================
+
+    private val _refreshTrigger = MutableSharedFlow<Unit>(replay = 0)
+    val refreshTrigger = _refreshTrigger.asSharedFlow()
+
+    suspend fun notifyDataChanged() {
+        _refreshTrigger.emit(Unit)
     }
 }

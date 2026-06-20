@@ -45,6 +45,7 @@ class CollectViewModel(
                     }
 
                     _events.emit(UiEvent.CollectionSaved)
+                    repository.notifyDataChanged()
                 } else {
                     _events.emit(UiEvent.Error("No current week found"))
                 }

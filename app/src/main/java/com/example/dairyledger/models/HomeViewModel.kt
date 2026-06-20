@@ -30,6 +30,11 @@ class HomeViewModel(
                 currentWeekTotal = repository.getCurrentWeekTotal()
                 todayCollectionSummary = repository.getCurrentWeekTodaysCollectionSummary()
             }
+
+            repository.refreshTrigger.collect {
+                currentWeekTotal = repository.getCurrentWeekTotal()
+                todayCollectionSummary = repository.getCurrentWeekTodaysCollectionSummary()
+            }
         }
     }
 

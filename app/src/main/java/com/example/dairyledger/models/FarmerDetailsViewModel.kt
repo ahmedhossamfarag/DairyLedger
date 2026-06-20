@@ -14,12 +14,23 @@ import kotlinx.coroutines.launch
 class FarmerDetailsViewModel(
     private val repository: DairyRepository
 ) : ViewModel() {
-    var farmerId by mutableLongStateOf(0)
+    var farmerId by mutableLongStateOf(-1)
         private set
     var farmer by mutableStateOf<Farmer?>(null)
         private set
     var collectionDetails by mutableStateOf<List<FarmerCollectionDetail>>(emptyList())
         private set
+
+    init {
+        viewModelScope.launch {
+            repository.refreshTrigger.collect {
+                if (farmerId >= 0) {
+                    collectionDetails = repository.getFarmerCurrentWeekDairies(farmerId)
+                }
+            }
+        }
+    }
+
 
     fun loadFarmer(id: Long) {
         viewModelScope.launch {

@@ -21,6 +21,17 @@ class ReportsViewModel(
     var farmerWeekTotal by mutableStateOf<List<FarmerWeekTotal>>(emptyList())
         private set
 
+    init {
+        viewModelScope.launch {
+            repository.refreshTrigger.collect {
+                if (weekId >= 0) {
+                    farmerWeekTotal = repository.getWeekFarmerTotals(weekId)
+                }
+            }
+        }
+    }
+
+
     fun loadWeek(id: Long) {
         viewModelScope.launch {
             weekId = id

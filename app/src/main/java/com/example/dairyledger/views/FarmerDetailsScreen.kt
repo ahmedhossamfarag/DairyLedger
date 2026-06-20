@@ -446,8 +446,8 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Day", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
-                Text(text = "Evening Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
-                Text(text = "Morning Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DairyGreen, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                Text(text = "Evening Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                Text(text = "Morning Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
             }
 
             // Structured body log rows mapping entries sequentially
@@ -460,8 +460,8 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = item.dayLabel, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = TextDark, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
-                    Text(text = item.eveningAmount, fontSize = 13.sp, color = MutedText, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
-                    Text(text = item.morningAmount, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                    Text(text = item.eveningAmount, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = SlateNavy, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                    Text(text = item.morningAmount, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = SiennaBrown, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
                 }
             }
         }

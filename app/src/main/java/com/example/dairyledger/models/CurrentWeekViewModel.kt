@@ -37,6 +37,10 @@ class CurrentWeekViewModel(
             if (week != null) {
                 weekTotal = repository.getCurrentWeekTotal()
             }
+
+            repository.refreshTrigger.collect {
+                weekTotal = repository.getCurrentWeekTotal()
+            }
         }
     }
 
