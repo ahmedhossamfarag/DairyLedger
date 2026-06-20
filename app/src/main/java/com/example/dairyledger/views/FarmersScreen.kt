@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.models.FarmersViewModel
 import com.example.dairyledger.ui.icons.AppIcons
 
@@ -60,7 +62,7 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
             ) {
                 Icon(
                     painter = painterResource(AppIcons.AddPerson),
-                    contentDescription = "Add New Farmer",
+                    contentDescription = stringResource(R.string.add_new_farmer),
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -95,7 +97,7 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "All Farmers ($farmersCount)",
+                        text = stringResource(R.string.all_farmers_count, farmersCount),
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -112,14 +114,14 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Collections",
+                    text = stringResource(R.string.active_collections),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextDark
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Sort by Name",
+                        text = stringResource(R.string.sort_by_name),
                         fontSize = 14.sp,
                         color = ValueGreen,
                         fontWeight = FontWeight.Medium
@@ -172,7 +174,7 @@ private fun FarmersTopBar() {
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "Farmers",
+                    text = stringResource(R.string.farmers),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -243,14 +245,14 @@ private fun FarmerCardRow(farmer: FarmerListItem, onFarmerCardClick: (Int) -> Un
             // Statistics block
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "STATUS",
+                    text = stringResource(R.string.status),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MutedText,
                     letterSpacing = 0.5.sp
                 )
                 Text(
-                    text = if (farmer.active) "ACTIVE" else "INACTIVE",
+                    text = if (farmer.active) stringResource(R.string.active_upper) else stringResource(R.string.inactive_upper),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (farmer.active) ValueGreen else InactiveBrown

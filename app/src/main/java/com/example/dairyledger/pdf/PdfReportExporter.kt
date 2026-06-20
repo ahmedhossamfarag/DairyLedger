@@ -9,6 +9,7 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.FileProvider
+import com.example.dairyledger.R
 import com.example.dairyledger.views.ReportRowItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,7 +47,6 @@ object PdfReportExporter {
 
     // Column width ratios — must sum to 1f: [name(+avatar), liters, price/L, total]
     private val columnWeights = floatArrayOf(0.42f, 0.18f, 0.20f, 0.20f)
-    private val headers = arrayOf("Name", "Liters", "Price/L", "Total")
 
     /**
      * Builds the PDF on a background thread, saves it, then launches a
@@ -58,26 +58,26 @@ object PdfReportExporter {
     suspend fun exportAndOpen(
         context: Context,
         rows: List<ReportRowItem>,
-        title: String = "Report",
+        title: String? = null,
         fileName: String = "report_${System.currentTimeMillis()}.pdf",
     ): Boolean {
         // Atomically flip false -> true; if it was already true, bail out.
         if (!isExporting.compareAndSet(false, true)) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, "Export already in progress…", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.export_already_in_progress), Toast.LENGTH_SHORT).show()
             }
             return false
         }
 
         return try {
             val file = withContext(Dispatchers.IO) {
-                generatePdf(context, rows, title, fileName)
+                generatePdf(context, rows, title ?: context.getString(R.string.report), fileName)
             }
             openPdf(context, file)
             true
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, "Failed to export PDF: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.failed_to_export_pdf, e.message.orEmpty()), Toast.LENGTH_LONG).show()
             }
             false
         } finally {
@@ -98,6 +98,12 @@ object PdfReportExporter {
         val document = PdfDocument()
         val contentWidth = PAGE_WIDTH - MARGIN * 2
         val colWidths = columnWeights.map { it * contentWidth }
+        val headers = arrayOf(
+            context.getString(R.string.pdf_header_name),
+            context.getString(R.string.pdf_header_liters),
+            context.getString(R.string.pdf_header_price_per_liter),
+            context.getString(R.string.pdf_header_total)
+        )
 
         val titlePaint = Paint().apply {
             color = AndroidColor.BLACK
@@ -234,7 +240,7 @@ object PdfReportExporter {
             try {
                 context.startActivity(intent)
             } catch (_: Exception) {
-                Toast.makeText(context, "No app found to open PDF files.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.no_pdf_app_found), Toast.LENGTH_LONG).show()
             }
         }
     }

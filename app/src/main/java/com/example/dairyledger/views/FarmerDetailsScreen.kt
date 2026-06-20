@@ -17,10 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.data.CollectionType
 import com.example.dairyledger.data.FarmerCollectionDetail
 import com.example.dairyledger.models.FarmerDetailsViewModel
@@ -49,7 +52,7 @@ fun FarmerDetailsScreen(
             containerColor = ScreenBg,
             topBar = {
                 FarmerDetailsTopBar(
-                    title = "Loading...",
+                    title = stringResource(R.string.loading),
                     onBackClick = { navigator.goback() },
                 )
             },
@@ -74,7 +77,7 @@ fun FarmerDetailsScreenContent(
     val farmerName: String = farmer.name
     val phone: String = farmer.phone
     val idNumber: String = farmerDetailsViewModel.farmerId.toString()
-    val statusLabel: String = if (farmer.active) "Active" else "Inactive"
+    val statusLabel: String = if (farmer.active) stringResource(R.string.active) else stringResource(R.string.inactive)
     val morningTotal: String = numberFormatter.format(
         farmerCollections
         .filter { it.type == CollectionType.MORNING }
@@ -85,12 +88,14 @@ fun FarmerDetailsScreenContent(
         .filter { it.type == CollectionType.EVENING }
         .sumOf { it.value.toDouble() }
     )
-    val cumulativeTotal: String = numberFormatter.format(
-        farmerCollections.sumOf { it.value.toDouble() }
-    )
+    val cumulativeTotal: Double = farmerCollections.sumOf { it.value.toDouble() }
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
-    val totalAmountDue: String = numberFormatter.format (cumulativeTotal.toDouble() * unitPrice)
-    val weeklyShiftLogs: List<ShiftLogItem> = remember(farmerCollections) { createShiftListOf(farmerCollections, numberFormatter) }
+    val totalAmountDue: String = numberFormatter.format (cumulativeTotal * unitPrice)
+    val daysOfWeek = stringArrayResource(R.array.days_of_week_short).toList()
+    val literShortTemplate = stringResource(R.string.amount_liters_short)
+    val weeklyShiftLogs: List<ShiftLogItem> = remember(farmerCollections, daysOfWeek, literShortTemplate) {
+        createShiftListOf(farmerCollections, numberFormatter, daysOfWeek, literShortTemplate)
+    }
     val onBackClick: () -> Unit = { navigator.goback() }
 
     Scaffold(
@@ -128,13 +133,13 @@ fun FarmerDetailsScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ShiftTotalDisplayCard(
-                    title = "Morning Total",
+                    title = stringResource(R.string.morning_total),
                     value = morningTotal,
                     isPrimaryHighlight = true,
                     modifier = Modifier.weight(1f)
                 )
                 ShiftTotalDisplayCard(
-                    title = "Evening Total",
+                    title = stringResource(R.string.evening_total),
                     value = eveningTotal,
                     isPrimaryHighlight = false,
                     modifier = Modifier.weight(1f)
@@ -144,7 +149,7 @@ fun FarmerDetailsScreenContent(
             Spacer(Modifier.height(16.dp))
 
             // Large Full-Width Production Aggregation Display Card
-            CumulativeProductionCard(totalVolume = cumulativeTotal)
+            CumulativeProductionCard(totalVolume = numberFormatter.format(cumulativeTotal))
 
             Spacer(Modifier.height(16.dp))
 
@@ -190,7 +195,7 @@ private fun FarmerDetailsTopBar(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBackClick) {
-                    Icon(painter = painterResource(AppIcons.ArrowBack), contentDescription = "Back", tint = DairyGreen)
+                    Icon(painter = painterResource(AppIcons.ArrowBack), contentDescription = stringResource(R.string.back), tint = DairyGreen)
                 }
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -265,7 +270,7 @@ private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: Str
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("ID NUMBER", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
+                    Text(stringResource(R.string.id_number), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
                     Spacer(Modifier.height(2.dp))
                     Text(idNumber, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
                 }
@@ -277,7 +282,7 @@ private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: Str
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("STATUS", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
+                    Text(stringResource(R.string.status), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
                     Spacer(Modifier.height(2.dp))
                     Text(status, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (active) DairyGreen else InactiveBrown)
                 }
@@ -306,7 +311,7 @@ private fun ShiftTotalDisplayCard(title: String, value: String, isPrimaryHighlig
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "This Week",
+                    text = stringResource(R.string.this_week),
                     fontSize = 12.sp,
                     color = if (isPrimaryHighlight) LightGreenBg else MutedText
                 )
@@ -328,7 +333,7 @@ private fun ShiftTotalDisplayCard(title: String, value: String, isPrimaryHighlig
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "Liters",
+                    text = stringResource(R.string.liters),
                     fontSize = 14.sp,
                     color = if (isPrimaryHighlight) LightGreenBg else TextDark,
                     modifier = Modifier.padding(bottom = 4.dp)
@@ -348,7 +353,7 @@ private fun CumulativeProductionCard(totalVolume: String) {
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Text(
-                text = "CUMULATIVE WEEKLY PRODUCTION",
+                text = stringResource(R.string.cumulative_weekly_production),
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = MutedText,
@@ -358,7 +363,7 @@ private fun CumulativeProductionCard(totalVolume: String) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(text = totalVolume, fontSize = 38.sp, fontWeight = FontWeight.Black, color = DairyGreen)
                 Spacer(Modifier.width(6.dp))
-                Text(text = "Liters Total", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = TextDark, modifier = Modifier.padding(bottom = 4.dp))
+                Text(text = stringResource(R.string.liters_total), fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = TextDark, modifier = Modifier.padding(bottom = 4.dp))
             }
         }
     }
@@ -376,13 +381,13 @@ private fun FinancialSummaryCard(unitPrice: String, totalDue: String) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(painter = painterResource(AppIcons.Wallet), contentDescription = null, tint = DairyGreen, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(text = "Financial Summary", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                Text(text = stringResource(R.string.financial_summary), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextDark)
             }
 
             Spacer(Modifier.height(16.dp))
 
             // Sub row info breakdown matrices
-            FinancialSummaryRow(label = "Unit Price (Standard Grade)", value = unitPrice)
+            FinancialSummaryRow(label = stringResource(R.string.unit_price_standard_grade), value = unitPrice)
 
             Spacer(Modifier.height(16.dp))
             HorizontalDivider(color = CardBorder, thickness = 1.dp)
@@ -394,8 +399,8 @@ private fun FinancialSummaryCard(unitPrice: String, totalDue: String) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(text = "Total Amount", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
-                    Text(text = "Due", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                    Text(text = stringResource(R.string.total_amount), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                    Text(text = stringResource(R.string.due), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
                 }
                 Text(text = totalDue, fontSize = 36.sp, fontWeight = FontWeight.Black, color = DairyGreen)
             }
@@ -428,7 +433,7 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Weekly Shift Collections",
+                text = stringResource(R.string.weekly_shift_collections),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextDark
@@ -444,9 +449,9 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
                     .padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Day", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
-                Text(text = "Evening Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
-                Text(text = "Morning Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                Text(text = stringResource(R.string.day), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
+                Text(text = stringResource(R.string.evening_shift), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                Text(text = stringResource(R.string.morning_shift), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
             }
 
             // Structured body log rows mapping entries sequentially
@@ -489,8 +494,8 @@ private fun PremiumQualityBatchAlertCard() {
             }
             Spacer(Modifier.width(14.dp))
             Column {
-                Text(text = "Premium Quality Batch", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PremiumAlertText)
-                Text(text = "Fat content averaged 4.2% this week.", fontSize = 12.sp, color = PremiumAlertText.copy(alpha = 0.85f))
+                Text(text = stringResource(R.string.premium_quality_batch), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = PremiumAlertText)
+                Text(text = stringResource(R.string.premium_quality_batch_message), fontSize = 12.sp, color = PremiumAlertText.copy(alpha = 0.85f))
             }
         }
     }
@@ -521,7 +526,7 @@ private fun ToggleActiveButtons(active: Boolean, farmerDetailsViewModel: FarmerD
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text = if (active) "Deactivate" else "Activate",
+            text = if (active) stringResource(R.string.deactivate) else stringResource(R.string.activate),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
@@ -531,10 +536,9 @@ private fun ToggleActiveButtons(active: Boolean, farmerDetailsViewModel: FarmerD
 private fun createShiftListOf(
     farmerCollections: List<FarmerCollectionDetail>,
     numberFormatter: DecimalFormat,
+    daysOfWeek: List<String>,
+    literShortTemplate: String,
 ) : List<ShiftLogItem> {
-    // 1. Define the order of days you want to display
-    val daysOfWeek = listOf("Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri")
-
     // 2. Divide the collections into morning and evening
     val morningCollections = farmerCollections.filter { it.type == CollectionType.MORNING }
     val eveningCollections = farmerCollections.filter { it.type == CollectionType.EVENING }
@@ -546,11 +550,11 @@ private fun createShiftListOf(
                 // Format to 1 decimal place or use your numberFormatter
                 morningAmount =
                     if (i < morningCollections.size)
-                        "${numberFormatter.format(morningCollections[i].value.toDouble())} L"
+                        literShortTemplate.format(numberFormatter.format(morningCollections[i].value.toDouble()))
                     else "",
                 eveningAmount =
                     if (i < eveningCollections.size)
-                        "${numberFormatter.format(eveningCollections[i].value.toDouble())} L"
+                        literShortTemplate.format(numberFormatter.format(eveningCollections[i].value.toDouble()))
                     else ""
             )
         }

@@ -15,10 +15,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.pdf.PdfReportExporter
@@ -75,14 +77,14 @@ fun ReportsContent(
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
     val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
 
-    val weekTitle = "Week ${reportsViewModel.week?.id}"
+    val weekTitle = stringResource(R.string.week_number, reportsViewModel.week?.id ?: 0)
     val dateRange: String = reportsViewModel.week?.let { week ->
         val calendar = Calendar.getInstance()
         calendar.time = week.startDate
         calendar.add(Calendar.DAY_OF_YEAR, 7)
         val endDate = calendar.time
 
-        "Week ${week.id} (${dayFormatter.format(week.startDate)} - ${dayFormatter.format(endDate)})"
+        stringResource(R.string.week_date_range, week.id, dayFormatter.format(week.startDate), dayFormatter.format(endDate))
     } ?: ""
     val totalMilk: Double = reportsViewModel.farmerWeekTotal.sumOf { it.total.toDouble() }
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
@@ -100,9 +102,10 @@ fun ReportsContent(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val weekReportTitle = stringResource(R.string.week_report)
     val onExportPdfClick: () -> Unit = {
         scope.launch {
-            PdfReportExporter.exportAndOpen(context, reportData, title = "Week Report")
+            PdfReportExporter.exportAndOpen(context, reportData, title = weekReportTitle)
         }
     }
     val onCloseWeek: () -> Unit = { navigator.gotoWeekClosing() }
@@ -144,7 +147,7 @@ fun ReportsContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Current Week",
+                        text = stringResource(R.string.current_week),
                         color = if (isCurrentWeek) Color.White else MutedText,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -162,14 +165,14 @@ fun ReportsContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SummaryMetricCard(
-                    title = "TOTAL MILK",
+                    title = stringResource(R.string.total_milk),
                     value = numberFormatter.format( totalMilk),
-                    suffix = "Ltr",
+                    suffix = stringResource(R.string.ltr),
                     valueColor = DairyGreen,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryMetricCard(
-                    title = "REVENUE",
+                    title = stringResource(R.string.revenue),
                     value = totalRevenue,
                     suffix = "",
                     valueColor = RevenueBrown,
@@ -201,7 +204,7 @@ fun ReportsContent(
                 ) {
                     Icon(painter = painterResource(AppIcons.Pdf), contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(text = "Export PDF", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = stringResource(R.string.export_pdf), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
 
@@ -224,7 +227,7 @@ fun ReportsContent(
                     ) {
                         Icon(painter = painterResource(AppIcons.Archive), contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text(text = "Close Week", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = stringResource(R.string.close_week), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -252,7 +255,7 @@ private fun ReportsTopBar() {
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "Weekly Summary",
+                    text = stringResource(R.string.weekly_summary),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -303,10 +306,10 @@ private fun DetailedReportTable(reportData: List<ReportRowItem>, totalMilk: Stri
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("FARMER NAME", fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(2f))
-                Text("LITERS", fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                Text("PRICE/L", fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
-                Text("TOTAL", fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1.2f))
+                Text(stringResource(R.string.farmer_name_upper), fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(2f))
+                Text(stringResource(R.string.liters_upper), fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.price_per_liter_upper), fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.total_upper), fontSize = 11.sp, color = MutedText, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.End, modifier = Modifier.weight(1.2f))
             }
             HorizontalDivider(color = CardBorder, thickness = 1.dp)
 
@@ -336,12 +339,12 @@ private fun DetailedReportTable(reportData: List<ReportRowItem>, totalMilk: Stri
                 horizontalArrangement = Arrangement.End
             ) {
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = "REPORT TOTAL", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
-                    Text(text = "$totalMilk Ltr", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
+                    Text(text = stringResource(R.string.report_total), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
+                    Text(text = stringResource(R.string.total_milk_ltr, totalMilk), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
                 }
                 Spacer(Modifier.width(24.dp))
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = "TOTAL PAYOUT", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
+                    Text(text = stringResource(R.string.total_payout), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
                     Text(text = totalRevenue, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
                 }
             }

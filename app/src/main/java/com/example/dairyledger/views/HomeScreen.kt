@@ -20,10 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.dairyledger.R
 import com.example.dairyledger.data.CollectionType
 import com.example.dairyledger.models.HomeViewModel
 import com.example.dairyledger.models.SettingsViewModel
@@ -58,8 +60,8 @@ fun HomeScreen(
         drawerState = drawerState,
         drawerContent = {
             AppDrawerContent(
-                agentName = "Collection Agent",
-                appVersion = "2.4.1",
+                agentName = stringResource(R.string.collection_agent),
+                appVersion = stringResource(R.string.app_version_241),
                 navController = navController,
             )
         }
@@ -108,16 +110,18 @@ fun HomeMainContent(
         calendar.add(Calendar.DAY_OF_YEAR, 7)
         val endDate = calendar.time
 
-        "Week ${week.id} (${dateFormatter.format(week.startDate)} - ${dateFormatter.format(endDate)})"
+        stringResource(R.string.week_date_range, week.id, dateFormatter.format(week.startDate), dateFormatter.format(endDate))
     } ?: ""
+    val morningCollectionLabel = stringResource(R.string.morning_collection_multiline)
+    val eveningCollectionLabel = stringResource(R.string.evening_collection_multiline)
     val morning: CollectionStatus = homeViewModel.todayCollectionSummary
         .find { it.type == CollectionType.MORNING }
-        ?.let { CollectionStatus("Morning\nCollection", true, numberFormatter.format(it.totalAmount), it.farmerCount) }
-        ?: CollectionStatus("Morning\nCollection", false, "0", 0)
+        ?.let { CollectionStatus(morningCollectionLabel, true, numberFormatter.format(it.totalAmount), it.farmerCount) }
+        ?: CollectionStatus(morningCollectionLabel, false, "0", 0)
     val evening: CollectionStatus = homeViewModel.todayCollectionSummary
         .find { it.type == CollectionType.EVENING }
-        ?.let { CollectionStatus("Evening\nCollection", true, numberFormatter.format(it.totalAmount), it.farmerCount) }
-        ?: CollectionStatus("Evening\nCollection", false, "0", 0)
+        ?.let { CollectionStatus(eveningCollectionLabel, true, numberFormatter.format(it.totalAmount), it.farmerCount) }
+        ?: CollectionStatus(eveningCollectionLabel, false, "0", 0)
     val weeklyTotalLiters: String = numberFormatter.format(homeViewModel.currentWeekTotal)
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
 
@@ -136,7 +140,7 @@ fun HomeMainContent(
         Spacer(Modifier.height(12.dp))
 
         Text(
-            text = "Milk Collection",
+            text = stringResource(R.string.milk_collection),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A1A1A)
@@ -174,7 +178,7 @@ fun HomeMainContent(
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = "Daily Collection Entry",
+            text = stringResource(R.string.daily_collection_entry),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color(0xFF1A1A1A)
@@ -183,21 +187,21 @@ fun HomeMainContent(
         Spacer(Modifier.height(12.dp))
 
         PrimaryGreenButton(
-            text = "Morning Collection",
+            text = stringResource(R.string.morning_collection),
             onClick = onMorningCollectionClick
         )
 
         Spacer(Modifier.height(10.dp))
 
         PrimaryGreenButton(
-            text = "Evening Collection",
+            text = stringResource(R.string.evening_collection),
             onClick = onEveningCollectionClick
         )
 
         Spacer(Modifier.height(10.dp))
 
         SecondaryButton(
-            text = "View Weekly Report",
+            text = stringResource(R.string.view_weekly_report),
             icon = AppIcons.CalendarToday,
             onClick = onViewWeeklyReportClick
         )
@@ -224,7 +228,7 @@ private fun DairyTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Menu,
-                        contentDescription = "Open menu",
+                        contentDescription = stringResource(R.string.open_menu),
                         tint = Color(0xFF2A2A2A)
                     )
                 }
@@ -239,7 +243,7 @@ private fun DairyTopBar(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Dairy Operations",
+                    text = stringResource(R.string.dairy_operations),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -261,7 +265,7 @@ private fun CollectionStatusCard(status: CollectionStatus, modifier: Modifier = 
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            StatusPill(text = if (status.isDone) "Done" else "Pending", isDone = status.isDone)
+            StatusPill(text = if (status.isDone) stringResource(R.string.done) else stringResource(R.string.pending), isDone = status.isDone)
             Spacer(Modifier.height(10.dp))
             Text(
                 text = status.label,
@@ -279,7 +283,7 @@ private fun CollectionStatusCard(status: CollectionStatus, modifier: Modifier = 
                 )
                 Spacer(Modifier.width(2.dp))
                 Text(
-                    text = "L",
+                    text = stringResource(R.string.liters_unit_short),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF1A1A1A),
@@ -296,7 +300,7 @@ private fun CollectionStatusCard(status: CollectionStatus, modifier: Modifier = 
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "${status.farmerCount} Farmers",
+                    text = stringResource(R.string.farmers_count, status.farmerCount),
                     fontSize = 12.sp,
                     color = MutedText
                 )
@@ -344,7 +348,7 @@ private fun WeeklyTotalCard(totalLiters: String) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Weekly Total",
+                text = stringResource(R.string.weekly_total),
                 fontSize = 14.sp,
                 color = Color(0xFFBFD8BF)
             )
@@ -358,7 +362,7 @@ private fun WeeklyTotalCard(totalLiters: String) {
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "Liters",
+                    text = stringResource(R.string.liters),
                     fontSize = 16.sp,
                     color = Color(0xFFD9E8D9),
                     modifier = Modifier.padding(bottom = 6.dp)
@@ -400,7 +404,7 @@ private fun UnitPriceCard(price: String) {
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Current Unit Price",
+                    text = stringResource(R.string.current_unit_price),
                     fontSize = 13.sp,
                     color = MutedText
                 )
@@ -412,7 +416,7 @@ private fun UnitPriceCard(price: String) {
                         color = Color(0xFF1A1A1A)
                     )
                     Text(
-                        text = " / Liter",
+                        text = stringResource(R.string.per_liter),
                         fontSize = 13.sp,
                         color = MutedText
                     )
@@ -470,7 +474,7 @@ private fun SecondaryButton(text: String, icon: Int, onClick: () -> Unit) {
 
 @Composable
 private fun StartNewFloatingButton(onStartNewClick: () -> Unit) {
-    val text = "Start New Week"
+    val text = stringResource(R.string.start_new_week)
 
     FloatingActionButton(
         onClick = onStartNewClick,

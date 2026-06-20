@@ -15,9 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.data.Farmer
 import com.example.dairyledger.models.FarmersViewModel
 import com.example.dairyledger.ui.icons.AppIcons
@@ -25,7 +27,7 @@ import com.example.dairyledger.ui.icons.AppIcons
 
 @Composable
 fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
-    val routeLabel = "Register a new producer to the collection route #42."
+    val routeLabel = stringResource(R.string.register_new_producer)
     val onCancelClick: () -> Unit = { navigator.gotoFarmers() }
     val onSaveFarmerClick: (name: String, phone: String, notes: String) -> Unit = {
         name, phone, notes -> farmersViewModel.addFarmer(
@@ -81,7 +83,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                         )
                         Spacer(Modifier.width(10.dp))
                         Text(
-                            text = "Dairy Operations",
+                            text = stringResource(R.string.dairy_operations),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = DairyGreen
@@ -110,7 +112,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "Add New Farmer",
+                    text = stringResource(R.string.add_new_farmer),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextDark
@@ -135,7 +137,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Person,
-                    contentDescription = "Upload Avatar Pic",
+                    contentDescription = stringResource(R.string.upload_avatar_pic),
                     tint = MutedText,
                     modifier = Modifier.size(64.dp)
                 )
@@ -145,30 +147,30 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
 
             // Form inputs block
             FormInputField(
-                label = "Farmer Name",
+                label = stringResource(R.string.farmer_name),
                 value = farmerName,
                 onValueChange = { farmerName = it },
-                placeholder = "Enter full name",
+                placeholder = stringResource(R.string.enter_full_name),
                 leadingIcon = AppIcons.Person
             )
 
             Spacer(Modifier.height(16.dp))
 
             FormInputField(
-                label = "Phone Number",
+                label = stringResource(R.string.phone_number),
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                placeholder = "+1 (555) 000-0000",
+                placeholder = stringResource(R.string.phone_placeholder),
                 leadingIcon = AppIcons.Phone
             )
 
             Spacer(Modifier.height(20.dp))
 
             FormInputField(
-                label = "Additional Notes",
+                label = stringResource(R.string.additional_notes),
                 value = additionalNotes,
                 onValueChange = { additionalNotes = it },
-                placeholder = "Mention herd size, milk type, or specific instructions...",
+                placeholder = stringResource(R.string.additional_notes_placeholder),
                 leadingIcon = AppIcons.Description,
                 singleLine = false,
                 modifier = Modifier.height(100.dp)
@@ -190,7 +192,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                     border = androidx.compose.foundation.BorderStroke(1.dp, MutedText),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = TextDark)
                 ) {
-                    Text(text = "Cancel", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    Text(text = stringResource(R.string.cancel), fontSize = 16.sp, fontWeight = FontWeight.Medium)
                 }
 
                 Button(
@@ -208,7 +210,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(text = "Save Farmer", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                    Text(text = stringResource(R.string.save_farmer), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.White)
                 }
             }
             Spacer(Modifier.height(40.dp))

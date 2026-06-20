@@ -1,5 +1,7 @@
 package com.example.dairyledger.views
 
+import androidx.annotation.StringRes
+import com.example.dairyledger.R
 import com.example.dairyledger.ui.icons.AppIcons
 
 /**
@@ -10,28 +12,28 @@ import com.example.dairyledger.ui.icons.AppIcons
  */
 sealed class NavItem(
     val route: String,
-    val label: String,
+    @StringRes val labelRes: Int,
     val icon: Int,
     val defaultRoute: String = route,
     val baseRoute: String = route.substringBefore("/"),
 ) {
-    data object Home : NavItem("home", "Home", AppIcons.Home)
-    data object Collect : NavItem("collect/{type}", "Collect", AppIcons.AddCircle, "collect/default") {
+    data object Home : NavItem("home", R.string.home, AppIcons.Home)
+    data object Collect : NavItem("collect/{type}", R.string.collect, AppIcons.AddCircle, "collect/default") {
         fun createRoute(type: String) = "collect/$type"
     }
-    data object Reports : NavItem("reports/{weekId}", "Reports", AppIcons.BarChart, "reports/-1") {
+    data object Reports : NavItem("reports/{weekId}", R.string.reports, AppIcons.BarChart, "reports/-1") {
         fun createRoute(weekId: Int) = "reports/$weekId"
     }
-    data object Farmers : NavItem("farmers", "Farmers", AppIcons.People)
-    data object WeeklyArchive : NavItem("weekly-archive", "Weekly Archive", AppIcons.Inventory)
-    data object Settings : NavItem("settings", "Settings", AppIcons.Settings)
-    data object AddFarmer : NavItem("add-farmer", "Add Farmer", AppIcons.AddPerson)
+    data object Farmers : NavItem("farmers", R.string.farmers, AppIcons.People)
+    data object WeeklyArchive : NavItem("weekly-archive", R.string.weekly_archive, AppIcons.Inventory)
+    data object Settings : NavItem("settings", R.string.settings, AppIcons.Settings)
+    data object AddFarmer : NavItem("add-farmer", R.string.add_farmer, AppIcons.AddPerson)
 
 
-    data object FarmerDetails : NavItem("farmer-details/{farmerId}", "Farmer Details", AppIcons.Description) {
+    data object FarmerDetails : NavItem("farmer-details/{farmerId}", R.string.farmer_details, AppIcons.Description) {
         fun createRoute(farmerId: Int) = "farmer-details/$farmerId"
     }
-    data object WeekClosing : NavItem("week-closing", "Week Closing", AppIcons.Lock)
+    data object WeekClosing : NavItem("week-closing", R.string.week_closing, AppIcons.Lock)
 }
 
 val bottomNavItems = listOf(

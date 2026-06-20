@@ -18,12 +18,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.models.CollectViewModel
 import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
@@ -45,12 +47,15 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
     val dayFormatter = remember { java.text.SimpleDateFormat("EEEE, MMMM d", Locale.ENGLISH) }
 
-    val collectionType =
-        if (type == "morning") "Morning"
-        else if (type == "evening") "Evening"
-        else if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 15) "Morning"
-        else "Evening"
-    val titleLabel = "$collectionType Collection"
+    val collectionTypeKey =
+        if (type == "morning") "morning"
+        else if (type == "evening") "evening"
+        else if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 15) "morning"
+        else "evening"
+    val collectionTypeLabel = stringResource(
+        if (collectionTypeKey == "morning") R.string.morning else R.string.evening
+    )
+    val titleLabel = stringResource(R.string.collection_title, collectionTypeLabel)
     val dateLabel = dayFormatter.format(Date())
 
     val initialFarmers = collectViewModel.activeFarmers.map {
@@ -84,7 +89,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
             }.toMap()
 
             collectViewModel.saveCollection(
-                collectionType.lowercase(),
+                collectionTypeKey,
                 finalData
             )
         }
@@ -135,11 +140,11 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp),
-                    placeholder = { Text("Search Farmer", color = MutedText, fontSize = 15.sp) },
+                    placeholder = { Text(stringResource(R.string.search_farmer), color = MutedText, fontSize = 15.sp) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.search),
                             tint = MutedText
                         )
                     },
@@ -200,7 +205,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Save Collection",
+                            text = stringResource(R.string.save_collection),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -319,7 +324,7 @@ private fun FarmerCollectionCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
                 ) {
-                    Icon(painter = painterResource(AppIcons.Remove), contentDescription = "Decrease", tint = StatusGreen)
+                    Icon(painter = painterResource(AppIcons.Remove), contentDescription = stringResource(R.string.decrease), tint = StatusGreen)
                 }
 
                 // Core Interactive Text Field & Measurement Label
@@ -345,7 +350,7 @@ private fun FarmerCollectionCard(
                         singleLine = true
                     )
                     Text(
-                        text = "LITERS",
+                        text = stringResource(R.string.liters_upper),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color = MutedText,
@@ -364,7 +369,7 @@ private fun FarmerCollectionCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
                 ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Increase", tint = StatusGreen)
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.increase), tint = StatusGreen)
                 }
             }
         }

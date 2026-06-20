@@ -14,11 +14,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import com.example.dairyledger.R
 
 
 
@@ -29,8 +31,8 @@ import androidx.navigation.NavHostController
 @Composable
 fun AppDrawerContent(
     modifier: Modifier = Modifier,
-    agentName: String = "Dairy Ledger",
-    appVersion: String = "App Version 1.1.0 (Stable)",
+    agentName: String = stringResource(R.string.app_name),
+    appVersion: String = stringResource(R.string.app_version_241),
     navController: NavHostController,
 ) {
     ModalDrawerSheet(
@@ -76,7 +78,7 @@ fun AppDrawerContent(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Activity",
+                text = stringResource(R.string.activity),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = SectionLabelColor
@@ -86,7 +88,7 @@ fun AppDrawerContent(
 
             drawerNavItems.forEach {
                 DrawerRow(
-                    it.label,
+                    stringResource(it.labelRes),
                     painterResource(it.icon)
                 ) {
                     navController.navigate(it.route) {
@@ -146,4 +148,3 @@ private fun DrawerRow(
         }
     }
 }
-

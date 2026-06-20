@@ -16,9 +16,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.models.CurrentWeekViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.ui.icons.AppIcons
@@ -68,7 +70,7 @@ fun WeekClosingContent(
         calendar.add(Calendar.DAY_OF_YEAR, 7)
         val endDate = calendar.time
 
-        "Week Ending ${dayFormatter.format(endDate)}"
+        stringResource(R.string.week_ending, dayFormatter.format(endDate))
     } ?: ""
     val totalMilkCollected: Double = currentWeekViewModel.weekTotal.toDouble()
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
@@ -113,7 +115,7 @@ fun WeekClosingContent(
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "Weekly Summary",
+                text = stringResource(R.string.weekly_summary),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextDark
@@ -129,7 +131,7 @@ fun WeekClosingContent(
 
         // Card 2: Total Financial Payout Amount Summary
         SecondaryMetricCard(
-            title = "Total Amount",
+            title = stringResource(R.string.total_amount),
             value = totalAmountCollected,
             icon = AppIcons.Payments
         )
@@ -158,7 +160,7 @@ fun WeekClosingContent(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Archive & Start New Week",
+                    text = stringResource(R.string.archive_start_new_week),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -177,7 +179,7 @@ fun WeekClosingContent(
             colors = ButtonDefaults.outlinedButtonColors(contentColor = TextDark)
         ) {
             Text(
-                text = "Download PDF Report First",
+                text = stringResource(R.string.download_pdf_report_first),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium
             )
@@ -213,7 +215,7 @@ private fun ClosingTopBar() {
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "Dairy Operations",
+                    text = stringResource(R.string.dairy_operations),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -240,7 +242,7 @@ private fun PrimaryMetricHighlightCard(value: String) {
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "TOTAL MILK COLLECTED",
+                    text = stringResource(R.string.total_milk_collected),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White.copy(alpha = 0.9f),
@@ -258,7 +260,7 @@ private fun PrimaryMetricHighlightCard(value: String) {
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "Liters",
+                    text = stringResource(R.string.liters),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White.copy(alpha = 0.8f),
@@ -307,21 +309,21 @@ private fun ImportantNoticeAlertCard() {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Warning,
-                contentDescription = "Warning Indicator",
+                contentDescription = stringResource(R.string.warning_indicator),
                 tint = WarningText,
                 modifier = Modifier.size(22.dp)
             )
             Spacer(Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "Important Notice",
+                    text = stringResource(R.string.important_notice),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = WarningText
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = "Closing the week will archive all current records and clear the dashboard for Monday's new collections. This action cannot be undone.",
+                    text = stringResource(R.string.closing_week_warning),
                     fontSize = 13.sp,
                     color = WarningText,
                     lineHeight = 18.sp
@@ -361,7 +363,7 @@ private fun SystemReadinessPanel() {
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "System Ready for Archival",
+                    text = stringResource(R.string.system_ready_for_archival),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextDark

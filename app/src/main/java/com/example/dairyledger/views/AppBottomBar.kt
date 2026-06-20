@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -20,6 +21,7 @@ fun DairyBottomBar(navController: NavHostController) {
     NavigationBar {
         bottomNavItems.forEach { item ->
             val selected = currentDestination?.hierarchy?.any { it.route?.substringBefore("/") == item.baseRoute } == true
+            val itemLabel = stringResource(item.labelRes)
 
             NavigationBarItem(
                 selected = selected,
@@ -34,8 +36,8 @@ fun DairyBottomBar(navController: NavHostController) {
                         }
                     }
                 },
-                icon = { Icon(painter = painterResource(item.icon) , contentDescription = item.label) },
-                label = { Text(item.label) }
+                icon = { Icon(painter = painterResource(item.icon) , contentDescription = itemLabel) },
+                label = { Text(itemLabel) }
             )
         }
     }

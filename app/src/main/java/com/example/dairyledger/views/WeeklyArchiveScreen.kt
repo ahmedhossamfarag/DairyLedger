@@ -12,10 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dairyledger.R
 import com.example.dairyledger.data.WeekTotal
 import com.example.dairyledger.models.WeeklyArchiveViewModel
 import com.example.dairyledger.ui.icons.AppIcons
@@ -67,25 +70,21 @@ fun WeeklyArchiveContent(
 
     val weeks = weekArchiveViewModel.weeks
     val activeFarmers = weekArchiveViewModel.activeFarmersCount
+    val context = LocalContext.current
 
-    val dateRange: (WeekTotal) -> String = remember(dayFormatter) {
-        { week ->
-            val calendar = Calendar.getInstance()
-            calendar.time = week.startDate
-            val startPart = dayFormatter.format(week.startDate)
-
-            // Add 7 days to get the end date
-            calendar.add(Calendar.DAY_OF_YEAR, 7)
-            val endPart = dayFormatter.format(calendar.time)
-
-            "$startPart - $endPart"
-        }
+    val localizedDateRange: (WeekTotal) -> String = { week ->
+        val calendar = Calendar.getInstance()
+        calendar.time = week.startDate
+        val startPart = dayFormatter.format(week.startDate)
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        val endPart = dayFormatter.format(calendar.time)
+        context.getString(R.string.date_range, startPart, endPart)
     }
 
     val featuredArchive: FeaturedArchive =  weeks.first().let {
         FeaturedArchive(
-            "WEEK ${it.weekId}",
-            dateRange(it),
+            stringResource(R.string.week_upper, it.weekId),
+            localizedDateRange(it),
             numberFormatter.format(it.total),
             activeFarmers
         )
@@ -93,8 +92,8 @@ fun WeeklyArchiveContent(
     val recentArchives: List<WeeklyArchiveItem> = weeks.drop(1).map {
         WeeklyArchiveItem(
             id = it.weekId.toInt(),
-            weekLabel = "WEEK ${it.weekId}",
-            dateRange = dateRange(it),
+            weekLabel = stringResource(R.string.week_upper, it.weekId),
+            dateRange = localizedDateRange(it),
             yield = numberFormatter.format(it.total)
         )
     }
@@ -118,14 +117,14 @@ fun WeeklyArchiveContent(
         ) {
             Column {
                 Text(
-                    text = "Weekly Archive",
+                    text = stringResource(R.string.weekly_archive),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextDark
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Historical milk collection records",
+                    text = stringResource(R.string.historical_milk_records),
                     fontSize = 14.sp,
                     color = MutedText
                 )
@@ -158,7 +157,7 @@ fun WeeklyArchiveContent(
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
         ) {
-            Text(text = "Load Older Archives", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(text = stringResource(R.string.load_older_archives), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
 
         Spacer(Modifier.height(32.dp))
@@ -186,7 +185,7 @@ private fun ArchiveTopBar() {
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text = "Dairy Operations",
+                    text = stringResource(R.string.dairy_operations),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -228,7 +227,7 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
             }
 
             Spacer(Modifier.height(14.dp))
-            Text(text = "TOTAL YIELD", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MutedText, letterSpacing = 0.5.sp)
+            Text(text = stringResource(R.string.total_yield), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = MutedText, letterSpacing = 0.5.sp)
             
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -238,7 +237,7 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(text = data.totalYield, fontSize = 36.sp, fontWeight = FontWeight.Bold, color = DoneGreenBg)
                     Spacer(Modifier.width(4.dp))
-                    Text(text = "L", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoneGreenBg, modifier = Modifier.padding(bottom = 6.dp))
+                    Text(text = stringResource(R.string.liters_unit_short), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoneGreenBg, modifier = Modifier.padding(bottom = 6.dp))
                 }
                 Icon(
                     painter = painterResource(AppIcons.WaterDrop),
@@ -257,13 +256,13 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${data.activeFarmers} Active Farmers", fontSize = 13.sp, color = MutedText)
+                Text(text = stringResource(R.string.active_farmers_count, data.activeFarmers), fontSize = 13.sp, color = MutedText)
                 TextButton(
                     onClick = onViewReportClick,
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "View Report", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoneGreenBg)
+                        Text(text = stringResource(R.string.view_report), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoneGreenBg)
                         Spacer(Modifier.width(4.dp))
                         Icon(painter = painterResource(AppIcons.ArrowForward), contentDescription = null, tint = DoneGreenBg, modifier = Modifier.size(14.dp))
                     }
@@ -315,7 +314,7 @@ private fun WeeklyArchiveRowCard(item: WeeklyArchiveItem, onCardClick: (Int) -> 
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(text = item.yield, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextDark)
                     Spacer(Modifier.width(2.dp))
-                    Text(text = "L", fontSize = 12.sp, color = TextDark, modifier = Modifier.padding(bottom = 2.dp))
+                    Text(text = stringResource(R.string.liters_unit_short), fontSize = 12.sp, color = TextDark, modifier = Modifier.padding(bottom = 2.dp))
                 }
             }
         }
