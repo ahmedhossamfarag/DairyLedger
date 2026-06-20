@@ -446,8 +446,8 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Day", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
-                Text(text = "Morning Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DairyGreen, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
                 Text(text = "Evening Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MutedText, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                Text(text = "Morning Shift", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DairyGreen, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
             }
 
             // Structured body log rows mapping entries sequentially
@@ -460,8 +460,8 @@ private fun WeeklyCollectionsTableCard(logs: List<ShiftLogItem>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = item.dayLabel, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = TextDark, modifier = Modifier.padding(start = 12.dp).weight(0.8f))
-                    Text(text = item.morningAmount, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
                     Text(text = item.eveningAmount, fontSize = 13.sp, color = MutedText, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
+                    Text(text = item.morningAmount, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark, textAlign = TextAlign.Center, modifier = Modifier.weight(1.2f))
                 }
             }
         }
@@ -535,34 +535,27 @@ private fun createShiftListOf(
     dayFormatter: java.text.SimpleDateFormat
 ) : List<ShiftLogItem> {
     // 1. Define the order of days you want to display
-    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val daysOfWeek = listOf("Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri")
 
-    // 2. Process the collections list
-    val weeklyShiftLogs: List<ShiftLogItem> = run {
-        // Group collections by day ("Mon", "Tue", etc.)
-        val groupedByDay = farmerCollections.groupBy { dayFormatter.format(it.timestamp) }
+    // 2. Divide the collections into morning and evening
+    val morningCollections = farmerCollections.filter { it.type == CollectionType.MORNING }
+    val eveningCollections = farmerCollections.filter { it.type == CollectionType.EVENING }
 
-        daysOfWeek.map { day ->
-            val collectionsForDay = groupedByDay[day] ?: emptyList()
-
-            // Sum morning values
-            val morningSum = collectionsForDay
-                .filter { it.type == CollectionType.MORNING }
-                .sumOf { it.value.toDouble() }
-
-            // Sum evening values
-            val eveningSum = collectionsForDay
-                .filter { it.type == CollectionType.EVENING }
-                .sumOf { it.value.toDouble() }
-
+    // 3. Process the collections list
+    val weeklyShiftLogs: List<ShiftLogItem> = daysOfWeek.mapIndexed { i, day ->
             ShiftLogItem(
                 dayLabel = day,
                 // Format to 1 decimal place or use your numberFormatter
-                morningAmount = if (morningSum > 0) "${numberFormatter.format(morningSum)} L" else "0.0 L",
-                eveningAmount = if (eveningSum > 0) "${numberFormatter.format(eveningSum)} L" else "0.0 L"
+                morningAmount =
+                    if (i < morningCollections.size)
+                        "${numberFormatter.format(morningCollections[i].value.toDouble())} L"
+                    else "",
+                eveningAmount =
+                    if (i < eveningCollections.size)
+                        "${numberFormatter.format(eveningCollections[i].value.toDouble())} L"
+                    else ""
             )
         }
-    }
 
     return weeklyShiftLogs
 }
