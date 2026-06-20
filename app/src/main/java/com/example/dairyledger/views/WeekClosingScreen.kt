@@ -16,11 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.CurrentWeekViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
 import java.util.Calendar
 
@@ -130,7 +132,7 @@ fun WeekClosingContent(
         SecondaryMetricCard(
             title = "Total Amount",
             value = totalAmountCollected,
-            icon = Icons.Outlined.ShoppingCart
+            icon = AppIcons.Payments
         )
 
         Spacer(Modifier.height(20.dp))
@@ -151,7 +153,7 @@ fun WeekClosingContent(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Outlined.Lock,
+                    painter = painterResource(AppIcons.Archive),
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )
@@ -205,7 +207,7 @@ private fun ClosingTopBar() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(26.dp)
@@ -232,7 +234,7 @@ private fun PrimaryMetricHighlightCard(value: String) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Outlined.Notifications,
+                    painter = painterResource(AppIcons.WaterDrop),
                     contentDescription = null,
                     tint = Color.White.copy(alpha = 0.9f),
                     modifier = Modifier.size(18.dp)
@@ -269,7 +271,7 @@ private fun PrimaryMetricHighlightCard(value: String) {
 }
 
 @Composable
-private fun SecondaryMetricCard(title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+private fun SecondaryMetricCard(title: String, value: String, icon: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -277,7 +279,7 @@ private fun SecondaryMetricCard(title: String, value: String, icon: androidx.com
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = icon, contentDescription = null, tint = MutedText, modifier = Modifier.size(18.dp))
+                Icon(painter = painterResource(icon), contentDescription = null, tint = MutedText, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
             }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +29,7 @@ import androidx.navigation.NavHostController
 import com.example.dairyledger.data.CollectionType
 import com.example.dairyledger.models.HomeViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -198,7 +200,7 @@ fun HomeMainContent(
 
         SecondaryButton(
             text = "View Weekly Report",
-            icon = Icons.Outlined.DateRange,
+            icon = AppIcons.CalendarToday,
             onClick = onViewWeeklyReportClick
         )
     }
@@ -232,7 +234,7 @@ private fun DairyTopBar(
                 // Material Icons has no tractor glyph. Swap this for a custom
                 // vector asset, e.g. Icon(painterResource(R.drawable.ic_tractor), ...)
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(22.dp)
@@ -289,7 +291,7 @@ private fun CollectionStatusCard(status: CollectionStatus, modifier: Modifier = 
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Outlined.Person,
+                    painter = painterResource(AppIcons.People),
                     contentDescription = null,
                     tint = MutedText,
                     modifier = Modifier.size(14.dp)
@@ -316,7 +318,7 @@ private fun StatusPill(text: String, isDone: Boolean) {
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
         ) {
             Icon(
-                imageVector = if (isDone) Icons.Filled.CheckCircle else Icons.Filled.Warning,
+                painter = painterResource(if (isDone) AppIcons.CheckCircle else AppIcons.Schedule),
                 contentDescription = null,
                 tint = if (isDone) Color.White else Color(0xFF555555),
                 modifier = Modifier.size(13.dp)
@@ -391,7 +393,7 @@ private fun UnitPriceCard(price: String) {
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Check,
+                    painter = painterResource(AppIcons.Money),
                     contentDescription = null,
                     tint = Color(0xFF5C4500),
                     modifier = Modifier.size(20.dp)
@@ -446,7 +448,7 @@ private fun PrimaryGreenButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SecondaryButton(text: String, icon: ImageVector, onClick: () -> Unit) {
+private fun SecondaryButton(text: String, icon: Int, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier
@@ -457,7 +459,7 @@ private fun SecondaryButton(text: String, icon: ImageVector, onClick: () -> Unit
         border = BorderStroke(1.dp, CardBorder)
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(icon),
             contentDescription = null,
             tint = Color(0xFF333333),
             modifier = Modifier.size(18.dp)

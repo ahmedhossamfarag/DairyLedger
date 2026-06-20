@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,14 +27,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
-import java.util.Locale
 
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {
-    val agentName: String = "Collection Agent"
-    val agentRoute: String = "Route #42 - North District"
+    val profileTitle: String = "System Configuration"
+    val profileSubtitle: String = "Manage application preferences"
     val onSaveConfigClick: (Double) -> Unit = { unitPrice -> settingsViewModel.setDefaultPrice(unitPrice) }
     val onResetDefaultsClick: () -> Unit = {}
 
@@ -84,7 +85,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
             Spacer(Modifier.height(16.dp))
 
             // Profile Agent Header Card Banner
-            AgentProfileCard(name = agentName, route = agentRoute)
+            AgentProfileCard(name = profileTitle, route = profileSubtitle)
 
             Spacer(Modifier.height(20.dp))
 
@@ -121,7 +122,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
             ) {
-                Icon(imageVector = Icons.Outlined.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(painter = painterResource(AppIcons.Save), contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Save Configuration", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
@@ -137,7 +138,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
                 border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = ActiveGreen)
             ) {
-                Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(18.dp))
+                Icon(painter = painterResource(AppIcons.Reset), contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Reset to Defaults", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
@@ -165,7 +166,7 @@ private fun SettingsTopBar() {
                 }
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "Dairy Operations",
+                    text = "Settings",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
@@ -186,16 +187,14 @@ private fun AgentProfileCard(name: String, route: String) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Mocking Image Avatar component matching Settings.png design outline
             Box(
                 modifier = Modifier
                     .size(54.dp)
                     .clip(CircleShape)
                     .background(Color.Gray)
             ) {
-                // Application network/asset painter element would swap here
                 Icon(
-                    imageVector = Icons.Default.Person, 
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null, 
                     tint = Color.White,
                     modifier = Modifier
@@ -227,7 +226,7 @@ private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Outlined.Edit, contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(AppIcons.Payments), contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Unit Price", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextDark)
             }
@@ -246,7 +245,7 @@ private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit)
                     modifier = Modifier.size(46.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
                 ) {
-                    Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease price", tint = TextDark)
+                    Icon(painter = painterResource(AppIcons.Remove), contentDescription = "Decrease price", tint = TextDark)
                 }
 
                 // Numeric Presentation Center Field Box Display
@@ -308,7 +307,7 @@ private fun ResetDayCard(selectedDay: String, onDayClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Outlined.DateRange, contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(AppIcons.CalendarMonth), contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Weekly Reset Day", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextDark)
             }
@@ -337,7 +336,7 @@ private fun ResetDayCard(selectedDay: String, onDayClick: () -> Unit) {
             }
 
             Spacer(Modifier.height(12.dp))
-            Text(text = "Ledgers will automatically archive on this day.", fontSize = 12.sp, color = MutedText)
+            Text(text = "Users are encouraged to reset the archive on this day.", fontSize = 12.sp, color = MutedText)
         }
     }
 }
@@ -358,7 +357,7 @@ private fun CurrencyCard(currency: String, onCurrencyClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Outlined.ShoppingCart, contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(AppIcons.Exchange), contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Currency", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextDark)
             }

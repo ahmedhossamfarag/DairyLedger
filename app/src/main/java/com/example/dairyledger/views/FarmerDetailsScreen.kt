@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import com.example.dairyledger.data.CollectionType
 import com.example.dairyledger.data.FarmerCollectionDetail
 import com.example.dairyledger.models.FarmerDetailsViewModel
 import com.example.dairyledger.models.SettingsViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
 import kotlin.text.toDoubleOrNull
 
@@ -191,7 +193,7 @@ private fun FarmerDetailsTopBar(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBackClick) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = DairyGreen)
+                    Icon(painter = painterResource(AppIcons.ArrowBack), contentDescription = "Back", tint = DairyGreen)
                 }
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -300,7 +302,7 @@ private fun ShiftTotalDisplayCard(title: String, value: String, isPrimaryHighlig
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (isPrimaryHighlight) Icons.Outlined.Star else Icons.Outlined.Close,
+                    painter = painterResource(if (isPrimaryHighlight) AppIcons.LightMode else AppIcons.DarkMode),
                     contentDescription = null,
                     tint = if (isPrimaryHighlight) LightGreenBg else DairyGreen,
                     modifier = Modifier.size(18.dp)
@@ -375,7 +377,7 @@ private fun FinancialSummaryCard(unitPrice: String, totalDue: String) {
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = null, tint = DairyGreen, modifier = Modifier.size(22.dp))
+                Icon(painter = painterResource(AppIcons.Wallet), contentDescription = null, tint = DairyGreen, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(text = "Financial Summary", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextDark)
             }

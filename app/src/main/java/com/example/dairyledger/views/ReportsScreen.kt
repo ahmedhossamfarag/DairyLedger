@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.pdf.PdfReportExporter
+import com.example.dairyledger.ui.icons.AppIcons
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -201,7 +203,7 @@ fun ReportsContent(
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Email, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(painter = painterResource(AppIcons.Pdf), contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(text = "Export PDF", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
@@ -224,7 +226,7 @@ fun ReportsContent(
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MutedText)
                     ) {
-                        Icon(imageVector = Icons.Outlined.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(painter = painterResource(AppIcons.Archive), contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(text = "Close Week", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
@@ -247,7 +249,7 @@ private fun ReportsTopBar() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(24.dp)

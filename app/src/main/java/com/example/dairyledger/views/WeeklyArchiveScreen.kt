@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.data.WeekTotal
 import com.example.dairyledger.models.WeeklyArchiveViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import java.util.Calendar
 
 
@@ -180,7 +182,7 @@ private fun ArchiveTopBar() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(24.dp)
@@ -242,7 +244,7 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
                     Text(text = "L", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoneGreenBg, modifier = Modifier.padding(bottom = 6.dp))
                 }
                 Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
+                    painter = painterResource(AppIcons.WaterDrop),
                     contentDescription = null,
                     tint = DoneGreenBg,
                     modifier = Modifier.size(32.dp)
@@ -266,7 +268,7 @@ private fun FeaturedCard(data: FeaturedArchive, onViewReportClick: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "View Report", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoneGreenBg)
                         Spacer(Modifier.width(4.dp))
-                        Icon(imageVector = Icons.Filled.ArrowForward, contentDescription = null, tint = DoneGreenBg, modifier = Modifier.size(14.dp))
+                        Icon(painter = painterResource(AppIcons.ArrowForward), contentDescription = null, tint = DoneGreenBg, modifier = Modifier.size(14.dp))
                     }
                 }
             }
@@ -299,7 +301,7 @@ private fun WeeklyArchiveRowCard(item: WeeklyArchiveItem, onCardClick: (Int) -> 
                     .background(ArchiveIconBg),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = Icons.Outlined.CheckCircle, contentDescription = null, tint = MutedText, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(AppIcons.Inventory), contentDescription = null, tint = MutedText, modifier = Modifier.size(20.dp))
             }
 
             Spacer(Modifier.width(14.dp))

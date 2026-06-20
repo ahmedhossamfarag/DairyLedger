@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,7 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +87,7 @@ fun AppDrawerContent(
             drawerNavItems.forEach {
                 DrawerRow(
                     it.label,
-                    it.icon
+                    painterResource(it.icon)
                 ) {
                     navController.navigate(it.route) {
                         // Avoid building up a large stack as the user taps tabs.
@@ -116,7 +115,7 @@ fun AppDrawerContent(
 @Composable
 private fun DrawerRow(
     label: String,
-    icon: ImageVector,
+    icon: Painter,
     onClick: () -> Unit
 ) {
     Surface(
@@ -132,7 +131,7 @@ private fun DrawerRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 contentDescription = null,
                 tint = Color(0xFF3A3A3A),
                 modifier = Modifier.size(20.dp)

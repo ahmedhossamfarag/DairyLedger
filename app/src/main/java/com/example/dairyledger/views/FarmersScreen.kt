@@ -16,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.FarmersViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 
 data class FarmerListItem(
     val id: Long,
@@ -57,7 +59,7 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 modifier = Modifier.size(64.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
+                    painter = painterResource(AppIcons.AddPerson),
                     contentDescription = "Add New Farmer",
                     modifier = Modifier.size(32.dp)
                 )
@@ -86,7 +88,7 @@ fun FarmersScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Person,
+                        painter = painterResource(AppIcons.People),
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
@@ -163,7 +165,7 @@ private fun FarmersTopBar() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(24.dp)

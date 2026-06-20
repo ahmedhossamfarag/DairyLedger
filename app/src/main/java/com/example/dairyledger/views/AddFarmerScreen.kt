@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.data.Farmer
 import com.example.dairyledger.models.FarmersViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 
 
 @Composable
@@ -73,7 +75,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Filled.ShoppingCart,
+                            painter = painterResource(AppIcons.Agriculture),
                             contentDescription = null,
                             tint = DairyGreen,
                             modifier = Modifier.size(24.dp)
@@ -102,7 +104,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
             // Screen Subheading layout
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
+                    painter = painterResource(AppIcons.AddPerson),
                     contentDescription = null,
                     tint = TextDark,
                     modifier = Modifier.size(26.dp)
@@ -148,7 +150,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 value = farmerName,
                 onValueChange = { farmerName = it },
                 placeholder = "Enter full name",
-                leadingIcon = Icons.Outlined.Person
+                leadingIcon = AppIcons.Person
             )
 
             Spacer(Modifier.height(16.dp))
@@ -158,7 +160,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
                 placeholder = "+1 (555) 000-0000",
-                leadingIcon = Icons.Outlined.Phone
+                leadingIcon = AppIcons.Phone
             )
 
             Spacer(Modifier.height(20.dp))
@@ -168,7 +170,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 value = additionalNotes,
                 onValueChange = { additionalNotes = it },
                 placeholder = "Mention herd size, milk type, or specific instructions...",
-                leadingIcon = Icons.Outlined.Create,
+                leadingIcon = AppIcons.Description,
                 singleLine = false,
                 modifier = Modifier.height(100.dp)
             )
@@ -201,7 +203,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                     colors = ButtonDefaults.buttonColors(containerColor = DairyGreen)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Check,
+                        painter = painterResource(AppIcons.Save),
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
@@ -222,7 +224,7 @@ private fun FormInputField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    leadingIcon: androidx.compose.ui.graphics.vector.ImageVector,
+    leadingIcon: Int,
     singleLine: Boolean = true,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -238,7 +240,7 @@ private fun FormInputField(
             onValueChange = onValueChange,
             modifier = modifier.fillMaxWidth(),
             placeholder = { Text(text = placeholder, color = MutedText, fontSize = 15.sp) },
-            leadingIcon = { Icon(imageVector = leadingIcon, contentDescription = null, tint = MutedText) },
+            leadingIcon = { Icon(painter = painterResource(leadingIcon), contentDescription = null, tint = MutedText) },
             singleLine = singleLine,
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(

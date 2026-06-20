@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.models.CollectViewModel
+import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
 import java.util.Calendar
 import java.util.Date
@@ -191,7 +193,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
                         colors = ButtonDefaults.buttonColors(containerColor = DairyGreen, disabledContainerColor = MutedText)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Check,
+                            painter = painterResource(AppIcons.Save),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(20.dp)
@@ -229,7 +231,7 @@ private fun CollectionTopBar(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    painter = painterResource(AppIcons.Agriculture),
                     contentDescription = null,
                     tint = DairyGreen,
                     modifier = Modifier.size(28.dp)
@@ -317,7 +319,7 @@ private fun FarmerCollectionCard(
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
                 ) {
-                    Icon(imageVector = Icons.Filled.KeyboardArrowDown, contentDescription = "Decrease", tint = StatusGreen)
+                    Icon(painter = painterResource(AppIcons.Remove), contentDescription = "Decrease", tint = StatusGreen)
                 }
 
                 // Core Interactive Text Field & Measurement Label
