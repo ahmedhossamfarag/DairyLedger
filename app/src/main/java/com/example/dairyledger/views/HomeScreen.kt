@@ -49,40 +49,56 @@ fun HomeScreen(
     homeViewModel: HomeViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val agentName: String = "Collection Agent"
-    val appVersion: String = "App Version 2.4.1 (Stable)"
+    val currentWeek = homeViewModel.currentWeek
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    if (homeViewModel.currentWeek == null) {
-        val onStartNewClick: () -> Unit = { homeViewModel.createNewWeek() }
-
-        ModalNavigationDrawer(drawerState = drawerState,
-            drawerContent = {
-                AppDrawerContent(
-                    agentName = agentName,
-                    appVersion = appVersion,
-                    navController = navController,
-                )
-            }) {
-            Scaffold(
-                containerColor = ScreenBg,
-                topBar = {
-                    DairyTopBar(
-                        onMenuClick = { scope.launch { drawerState.open() } },
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppDrawerContent(
+                agentName = "Collection Agent",
+                appVersion = "2.4.1",
+                navController = navController,
+            )
+        }
+    ) {
+        Scaffold(
+            containerColor = ScreenBg,
+            topBar = {
+                DairyTopBar(onMenuClick = { scope.launch { drawerState.open() } })
+            },
+            floatingActionButton = {
+                // Only show FAB if there is no current week
+                if (currentWeek == null) {
+                    StartNewFloatingButton(onStartNewClick = { homeViewModel.createNewWeek() })
+                }
+            }
+        ) { innerPadding ->
+            // 2. Use a Box or AnimatedContent to swap views
+            Box(modifier = Modifier.padding(innerPadding)) {
+                if (currentWeek == null) {
+                    NoContentPlaceHolder()
+                } else {
+                    // Pass the non-null week to your main content
+                    HomeMainContent(
+                        homeViewModel = homeViewModel,
+                        settingsViewModel = settingsViewModel,
+                        navigator = navigator
                     )
-                },
-                floatingActionButton = { StartNewFloatingButton(onStartNewClick = onStartNewClick) }
-            ) { innerPadding ->
-                NoContentPlaceHolder(
-                    modifier = Modifier.padding(innerPadding)
-                )
+                }
             }
         }
-
-        return
     }
+}
 
+@Composable
+fun HomeMainContent(
+    navigator: Navigator,
+    homeViewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
     val dateFormatter = remember { SimpleDateFormat("MMM dd", Locale.ENGLISH) }
 
@@ -110,102 +126,81 @@ fun HomeScreen(
     val onViewWeeklyReportClick: () -> Unit = { navigator.gotoReports() }
 
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            AppDrawerContent(
-                agentName = agentName,
-                appVersion = appVersion,
-                navController = navController,
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ScreenBg)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
+        ) {
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Milk Collection",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = weekLabel,
+            fontSize = 14.sp,
+            color = MutedText
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        // Morning / Evening collection cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CollectionStatusCard(status = morning, modifier = Modifier.weight(1f))
+            CollectionStatusCard(status = evening, modifier = Modifier.weight(1f))
         }
-    ) {
-        Scaffold(
-            containerColor = ScreenBg,
-            topBar = {
-                DairyTopBar(
-                    onMenuClick = { scope.launch { drawerState.open() } },
-                )
-            },
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(ScreenBg)
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp)
-            ) {
-                Spacer(Modifier.height(12.dp))
 
-                Text(
-                    text = "Milk Collection",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A1A)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = weekLabel,
-                    fontSize = 14.sp,
-                    color = MutedText
-                )
+        Spacer(Modifier.height(16.dp))
 
-                Spacer(Modifier.height(16.dp))
+        WeeklyTotalCard(
+            totalLiters = weeklyTotalLiters,
+        )
 
-                // Morning / Evening collection cards
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CollectionStatusCard(status = morning, modifier = Modifier.weight(1f))
-                    CollectionStatusCard(status = evening, modifier = Modifier.weight(1f))
-                }
+        Spacer(Modifier.height(16.dp))
 
-                Spacer(Modifier.height(16.dp))
+        UnitPriceCard(
+            price = numberFormatter.format(unitPrice),
+        )
 
-                WeeklyTotalCard(
-                    totalLiters = weeklyTotalLiters,
-                )
+        Spacer(Modifier.height(24.dp))
 
-                Spacer(Modifier.height(16.dp))
+        Text(
+            text = "Daily Collection Entry",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF1A1A1A)
+        )
 
-                UnitPriceCard(
-                    price = numberFormatter.format(unitPrice),
-                )
+        Spacer(Modifier.height(12.dp))
 
-                Spacer(Modifier.height(24.dp))
+        PrimaryGreenButton(
+            text = "Morning Collection",
+            onClick = onMorningCollectionClick
+        )
 
-                Text(
-                    text = "Daily Collection Entry",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1A1A1A)
-                )
+        Spacer(Modifier.height(10.dp))
 
-                Spacer(Modifier.height(12.dp))
+        PrimaryGreenButton(
+            text = "Evening Collection",
+            onClick = onEveningCollectionClick
+        )
 
-                PrimaryGreenButton(
-                    text = "Morning Collection",
-                    onClick = onMorningCollectionClick
-                )
+        Spacer(Modifier.height(10.dp))
 
-                Spacer(Modifier.height(10.dp))
-
-                PrimaryGreenButton(
-                    text = "Evening Collection",
-                    onClick = onEveningCollectionClick
-                )
-
-                Spacer(Modifier.height(10.dp))
-
-                SecondaryButton(
-                    text = "View Weekly Report",
-                    icon = Icons.Outlined.DateRange,
-                    onClick = onViewWeeklyReportClick
-                )
-            }
-        }
+        SecondaryButton(
+            text = "View Weekly Report",
+            icon = Icons.Outlined.DateRange,
+            onClick = onViewWeeklyReportClick
+        )
     }
 }
 
