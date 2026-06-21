@@ -42,14 +42,34 @@ import com.example.dairyledger.views.ReportsScreen
 import com.example.dairyledger.views.SettingsScreen
 import com.example.dairyledger.views.WeekClosingScreen
 import com.example.dairyledger.views.WeeklyArchiveScreen
+import android.content.Context
+import android.content.res.Configuration
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     val repository by lazy { (application as DairyLedgerApp).repository }
     val settingsRepository by lazy { (application as DairyLedgerApp).settingsRepository }
 
+    override fun attachBaseContext(newBase: Context) {
+        // Force the locale to Arabic
+        val locale = Locale("ar")
+        Locale.setDefault(locale)
+
+        val configuration = Configuration(newBase.resources.configuration)
+        configuration.setLocale(locale)
+        configuration.setLayoutDirection(locale)
+
+        // This applies the localized configuration to the context
+        val context = newBase.createConfigurationContext(configuration)
+        super.attachBaseContext(context)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // No need to set locale here anymore, it's handled in attachBaseContext
+
         setContent {
             DairyLedgerTheme {
                 DairyApp(repository, settingsRepository)
