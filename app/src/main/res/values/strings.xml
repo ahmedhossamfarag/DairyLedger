@@ -92,8 +92,8 @@
     <string name="day">Day</string>
     <string name="evening_shift">Evening Shift</string>
     <string name="morning_shift">Morning Shift</string>
-    <string name="premium_quality_batch">Premium Quality Batch</string>
-    <string name="premium_quality_batch_message">Fat content averaged 4.2% this week.</string>
+    <string name="premium_quality_batch">Weekly Performance Summary</string>
+    <string name="premium_quality_batch_message">All collection data for the current period has been processed and updated.</string>
     <string name="deactivate">Deactivate</string>
     <string name="activate">Activate</string>
     <string name="week_report">Week Report</string>

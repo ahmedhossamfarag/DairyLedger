@@ -93,8 +93,8 @@
     <string name="day">اليوم</string>
     <string name="evening_shift">الفترة المسائية</string>
     <string name="morning_shift">الفترة الصباحية</string>
-    <string name="premium_quality_batch">دفعة ذات جودة ممتازة</string>
-    <string name="premium_quality_batch_message">بلغ متوسط نسبة الدهون 4.2% هذا الأسبوع.</string>
+    <string name="premium_quality_batch">ملخص الأداء الأسبوعي</string>
+    <string name="premium_quality_batch_message">تم معالجة وتحديث جميع بيانات التجميع للفترة الحالية.</string>
     <string name="deactivate">تعطيل</string>
     <string name="activate">تنشيط</string>
     <string name="week_report">تقرير الأسبوع</string>
