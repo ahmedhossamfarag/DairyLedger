@@ -14,16 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.R
 import com.example.dairyledger.models.ReportsViewModel
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.pdf.PdfReportExporter
+import com.example.dairyledger.pdf.PdfReportExporterRtl
 import com.example.dairyledger.ui.icons.AppIcons
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -103,11 +106,18 @@ fun ReportsContent(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val weekReportTitle = stringResource(R.string.week_report)
+    val layoutDirection = LocalLayoutDirection.current
+
     val onExportPdfClick: () -> Unit = {
         scope.launch {
-            PdfReportExporter.exportAndOpen(context, reportData, title = weekReportTitle)
+            if (layoutDirection == LayoutDirection.Rtl) {
+                PdfReportExporterRtl.exportAndOpen(context, reportData, title = weekReportTitle)
+            } else {
+                PdfReportExporter.exportAndOpen(context, reportData, title = weekReportTitle)
+            }
         }
     }
+
     val onCloseWeek: () -> Unit = { navigator.gotoWeekClosing() }
     val isCurrentWeek = reportsViewModel.weekId == -1L
 
