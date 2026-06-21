@@ -34,6 +34,12 @@ sealed class NavItem(
         fun createRoute(farmerId: Int) = "farmer-details/$farmerId"
     }
     data object WeekClosing : NavItem("week-closing", R.string.week_closing, AppIcons.Lock)
+
+    data object CollectionEdit : NavItem("collection-edit/{collectionId}", R.string.collection_edit, AppIcons.AddCircle) {
+        fun createRoute(collectionId: Int) = "collection-edit/$collectionId"
+    }
+    
+    data object CollectionArchive: NavItem("collection-archive", R.string.collection_archive, AppIcons.WaterDrop)
 }
 
 val bottomNavItems = listOf(
@@ -45,6 +51,7 @@ val bottomNavItems = listOf(
 
 
 val drawerNavItems = listOf(
+    NavItem.CollectionArchive,
     NavItem.WeeklyArchive,
     NavItem.Settings,
 )
@@ -56,9 +63,11 @@ class Navigator(
     val gotoReports: () -> Unit,
     val gotoFarmers: () -> Unit,
     val gotoWeeklyArchive: () -> Unit,
+    val gotoCollectionArchive: () -> Unit,
     val gotoSettings: () -> Unit,
     val gotoWeekReport: (weekId: Int) -> Unit,
     val gotoCollectWithType: (type: String) -> Unit,
+    val gotoCollection: (collectionId: Int) -> Unit,
     val gotoAddFarmer: () -> Unit,
     val gotoFarmerDetails: (farmerId: Int) -> Unit,
     val gotoWeekClosing: () -> Unit,

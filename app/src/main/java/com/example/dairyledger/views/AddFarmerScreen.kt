@@ -48,6 +48,13 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 is FarmersViewModel.UiEvent.FarmerAdded -> {
                     navigator.gotoFarmers()
                 }
+                is FarmersViewModel.UiEvent.NameLengthError -> {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.name_is_too_short),
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
+                }
                 is FarmersViewModel.UiEvent.Error -> {
                     android.widget.Toast.makeText(
                         context,

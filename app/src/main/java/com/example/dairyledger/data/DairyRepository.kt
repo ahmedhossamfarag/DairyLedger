@@ -101,6 +101,14 @@ class DairyRepository(context: Context) {
     }
 
     // ============================================================
+    // Update Dairy
+    // ============================================================
+
+    suspend fun updateDairy(collectionId: Long, farmerId: Long, value: Float) {
+        dairyDao.update(Dairy(collectionId = collectionId, farmerId = farmerId, value = value))
+    }
+
+    // ============================================================
     // Get Current Week Today's Collections
     // (Total Dairies amount, and Count of Farmers)
     // ============================================================
@@ -112,12 +120,38 @@ class DairyRepository(context: Context) {
     }
 
     // ============================================================
+    // Get Collection By ID
+    // ============================================================
+
+    suspend fun getCollection(collectionId: Long): Collection? {
+        return collectionDao.getCollection(collectionId)
+    }
+
+
+    // ============================================================
+    // Get Collection Saved Dairies
+    // ============================================================
+
+    suspend fun getCollectionDairies(collectionId: Long): List<FarmersDairies> {
+        return dairyDao.getCollectionDairies(collectionId)
+    }
+
+    // ============================================================
     // Get Current Week Total Dairies amount
     // ============================================================
 
     suspend fun getCurrentWeekTotal(): Float {
         val week = currentWeekOrNull() ?: return 0f
         return dairyDao.getWeekTotal(week.id)
+    }
+
+    // ============================================================
+    // Get Current Week Collections
+    // ============================================================
+
+    suspend fun getCurrentWeekCollections(): List<CollectionWithTotal> {
+        val week = currentWeekOrNull() ?: return emptyList()
+        return collectionDao.getCollectionsForWeek(week.id)
     }
 
     // ============================================================

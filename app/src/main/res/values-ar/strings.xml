@@ -136,6 +136,11 @@
     <string name="export_already_in_progress">عملية التصدير جارية بالفعل...</string>
     <string name="failed_to_export_pdf">فشل تصدير PDF: %1$s</string>
     <string name="no_pdf_app_found">لم يتم العثور على تطبيق لفتح ملفات PDF.</string>
+    <string name="collection_edit">تعديل التجميع</string>
+    <string name="morning_collection_indexed">التجميع الصباحي #%1$d</string>
+    <string name="evening_collection_indexed">التجميع المسائي #%1$d</string>
+    <string name="collection_archive">أرشيف التجميع</string>
+    <string name="name_is_too_short">أدخل اسم مناسب</string>
     <string-array name="days_of_week_short">
         <item>السبت</item>
         <item>الأحد</item>

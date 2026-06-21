@@ -30,14 +30,13 @@ import androidx.compose.ui.unit.sp
 import com.example.dairyledger.R
 import com.example.dairyledger.models.CollectViewModel
 import com.example.dairyledger.ui.icons.AppIcons
-import java.text.DecimalFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 
 data class FarmerCollectionState(
-    val id: String,
+    val id: Long,
     val name: String,
     val initialLiters: Double,
     val isChecked: Boolean
@@ -48,9 +47,11 @@ data class FarmerCollectionState(
 fun CollectScreen(type: String = "default", navigator: Navigator, collectViewModel: CollectViewModel) {
     val dayFormatter = remember { java.text.SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()) }
 
+    val collectionType = collectViewModel.collection?.type?.name?.lowercase() ?: type
+
     val collectionTypeKey =
-        if (type == "morning") "morning"
-        else if (type == "evening") "evening"
+        if (collectionType == "morning") "morning"
+        else if (collectionType == "evening") "evening"
         else if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 15) "morning"
         else "evening"
     val collectionTypeLabel = stringResource(
@@ -61,7 +62,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
 
     val initialFarmers = collectViewModel.activeFarmers.map {
         FarmerCollectionState(
-            id = it.id.toString(),
+            id = it.id,
             name = it.name,
             initialLiters = 0.0,
             isChecked = false
@@ -71,29 +72,21 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
     var searchQuery by remember { mutableStateOf("") }
     
     // Track the liters input for each farmer dynamically
-    val volumesState = remember { 
-        mutableStateMapOf<String, String>().apply {
-            initialFarmers.forEach { this[it.id] = it.initialLiters.toString() }
-        }
-    }
+    val volumesState = remember { collectViewModel.volumes }
 
     var savingActive by remember { mutableStateOf(true) }
 
-    val onSaveCollectionClick: (Map<String, Double>) -> Unit = {
+    val onSaveCollectionClick: () -> Unit = {
         if (savingActive) {
             savingActive = false
-
-            val finalData = volumesState.mapNotNull { (id, value) ->
-                val idInt = id.toIntOrNull()
-                val volumeDouble = value.toDoubleOrNull() ?: 0.0
-                if (idInt != null) idInt to volumeDouble else null
-            }.toMap()
-
             collectViewModel.saveCollection(
-                collectionTypeKey,
-                finalData
+                collectionTypeKey
             )
         }
+    }
+
+    val onResetDefaultsClick: () -> Unit = {
+        collectViewModel.resetVolumes()
     }
 
     val context = LocalContext.current
@@ -185,12 +178,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
 
                     // Persistent Action Button at the base of the scrollable list
                     Button(
-                        onClick = {
-                            val finalData = initialFarmers.associate {
-                                it.id to (volumesState[it.id]?.toDoubleOrNull() ?: 0.0)
-                            }
-                            onSaveCollectionClick(finalData)
-                        },
+                        onClick = onSaveCollectionClick,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp),
@@ -214,6 +202,22 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
                     }
 
                     Spacer(Modifier.height(24.dp))
+
+                    OutlinedButton(
+                        onClick = onResetDefaultsClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(50),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = ActiveGreen)
+                    ) {
+                        Icon(painter = painterResource(AppIcons.Reset), contentDescription = null, tint = ActiveGreen, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.reset_to_defaults), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    Spacer(Modifier.height(32.dp))
                 }
             }
         }

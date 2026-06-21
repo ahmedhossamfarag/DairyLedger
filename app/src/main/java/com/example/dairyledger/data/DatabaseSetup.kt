@@ -13,7 +13,7 @@ data class Farmer(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    val phone: String,
+    val phone: String = "",
     val note: String = "",
     val active: Boolean = true
 )
@@ -122,6 +122,17 @@ data class FarmerCollectionDetail(
     val value: Float
 )
 
+data class FarmersDairies(
+    val farmerId: Long,
+    val farmerName: String,
+    val value: Float
+)
+
+data class CollectionWithTotal(
+    @Embedded val collection: Collection,
+    @ColumnInfo(name = "totalYield") val totalYield: Float
+)
+
 // ============================================================
 // DAOs
 // ============================================================
@@ -167,8 +178,19 @@ interface CollectionDao {
     @Insert
     suspend fun insert(collection: Collection): Long
 
-    @Query("SELECT * FROM collection WHERE weekId = :weekId ORDER BY timestamp ASC")
-    suspend fun getCollectionsForWeek(weekId: Long): List<Collection>
+    @Query("SELECT * FROM collection WHERE id = :collectionId LIMIT 1")
+    suspend fun getCollection(collectionId: Long): Collection?
+
+
+    @Query("""
+        SELECT c.*, COALESCE(SUM(d.value), 0.0) as totalYield
+        FROM collection c
+        LEFT JOIN dairy d ON c.id = d.collectionId
+        WHERE c.weekId = :weekId
+        GROUP BY c.id
+        ORDER BY c.timestamp ASC
+    """)
+    suspend fun getCollectionsForWeek(weekId: Long): List<CollectionWithTotal>
 
     @Query(
         """
@@ -186,6 +208,9 @@ interface DairyDao {
 
     @Insert
     suspend fun insert(dairy: Dairy)
+
+    @Update
+    suspend fun update(dairyDao: Dairy)
 
     @Query(
         """
@@ -264,6 +289,17 @@ interface DairyDao {
         """
     )
     suspend fun getFarmerDairiesForWeek(weekId: Long, farmerId: Long): List<FarmerCollectionDetail>
+
+    @Query(
+        """
+        SELECT f.id as farmerId, f.name as farmerName, d.value as value
+        FROM dairy d
+        INNER JOIN farmer f ON d.farmerId = f.id
+        WHERE d.collectionId = :collectionId
+        ORDER BY farmerName ASC
+        """
+    )
+    suspend fun getCollectionDairies(collectionId: Long): List<FarmersDairies>
 }
 
 // ============================================================

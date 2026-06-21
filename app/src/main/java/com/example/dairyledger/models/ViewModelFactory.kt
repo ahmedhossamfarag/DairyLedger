@@ -23,6 +23,10 @@ class ViewModelFactory(private val repository: DairyRepository) : ViewModelProvi
             @Suppress("UNCHECKED_CAST")
             return FarmersViewModel(repository) as T
         }
+        if (modelClass.isAssignableFrom(CollectionArchiveViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CollectionArchiveViewModel(repository) as T
+        }
         if (modelClass.isAssignableFrom(WeeklyArchiveViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return WeeklyArchiveViewModel(repository) as T

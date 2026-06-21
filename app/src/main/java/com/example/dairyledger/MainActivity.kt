@@ -44,6 +44,8 @@ import com.example.dairyledger.views.WeekClosingScreen
 import com.example.dairyledger.views.WeeklyArchiveScreen
 import android.content.Context
 import android.content.res.Configuration
+import com.example.dairyledger.models.CollectionArchiveViewModel
+import com.example.dairyledger.views.CollectionArchiveScreen
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -98,6 +100,7 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
     val gotoReports = { navigateTab(NavItem.Reports.defaultRoute) }
     val gotoFarmers = { navigateTab(NavItem.Farmers.defaultRoute) }
 
+    val gotoCollectionArchive = { navigateTab(NavItem.CollectionArchive.defaultRoute) }
     val gotoWeeklyArchive = { navigateTab(NavItem.WeeklyArchive.defaultRoute) }
     val gotoSettings = { navigateTab(NavItem.Settings.defaultRoute) }
     val gotoWeekReport = { weekId: Int ->
@@ -113,6 +116,11 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
     val gotoWeekClosing = { navController.navigate(NavItem.WeekClosing.route) }
     val goback = { navController.popBackStack() }
 
+    val gotoCollection = { collectionId: Int ->
+        navigateTab(NavItem.CollectionEdit.createRoute(collectionId))
+    }
+
+
 
     val navigator = Navigator(
         gotoHome,
@@ -120,9 +128,11 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
         gotoReports,
         gotoFarmers,
         gotoWeeklyArchive,
+        gotoCollectionArchive,
         gotoSettings,
         gotoWeekReport,
         gotoCollectWithType,
+        gotoCollection,
         gotoAddFarmer,
         gotoFarmerDetails,
         gotoWeekClosing,
@@ -152,8 +162,13 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
             composable(NavItem.Collect.route,
                 arguments = listOf(navArgument("type") { type = NavType.StringType })
             ) {
-                val vm: CollectViewModel = viewModel(factory = ViewModelFactory(repository))
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val vm: CollectViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = ViewModelFactory(repository)
+                )
                 val type = it.arguments?.getString("type") ?: "default"
+                LaunchedEffect(Unit) { vm.loadCollection() }
                 CollectScreen(type, navigator, vm)
             }
 
@@ -177,6 +192,11 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
                 // Farmers is the main entry point for the farmers' flow
                 val vm: FarmersViewModel = viewModel(factory = ViewModelFactory(repository))
                 FarmersScreen(navigator, vm)
+            }
+
+            composable(NavItem.CollectionArchive.route) {
+                val vm: CollectionArchiveViewModel = viewModel(factory = ViewModelFactory(repository))
+                CollectionArchiveScreen(navigator, vm)
             }
 
             composable(NavItem.WeeklyArchive.route) {
@@ -227,6 +247,20 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
                     factory = SettingsViewModelFactory(settingsRepository)
                 )
                 WeekClosingScreen(navigator, vm, settingVM)
+            }
+
+            composable(NavItem.CollectionEdit.route,
+                arguments = listOf(navArgument("collectionId") { type = NavType.LongType})
+            ) {
+                val homeEntry = remember(it) { navController.getBackStackEntry(NavItem.Home.route) }
+                val vm: CollectViewModel = viewModel(
+                    viewModelStoreOwner = homeEntry,
+                    factory = ViewModelFactory(repository)
+                )
+                val type = "default"
+                val collectionId = it.arguments?.getLong("collectionId") ?: -1
+                LaunchedEffect(Unit) { vm.loadCollection(collectionId) }
+                CollectScreen(type, navigator, vm)
             }
         }
     }

@@ -17,6 +17,7 @@ class FarmersViewModel(
     sealed interface UiEvent {
         data object FarmerAdded : UiEvent
         data class Error(val message: String) : UiEvent
+        data object NameLengthError : UiEvent
     }
 
     private val _events = MutableSharedFlow<UiEvent>()
@@ -34,7 +35,16 @@ class FarmersViewModel(
     fun addFarmer(farmer: Farmer) {
         viewModelScope.launch {
             try {
-                repository.addFarmer(farmer.name, farmer.phone, farmer.note, farmer.active)
+                if (farmer.name.trim().length < 3) {
+                    _events.emit(UiEvent.NameLengthError)
+                    return@launch
+                }
+                repository.addFarmer(
+                    farmer.name.trim(),
+                    farmer.phone.trim(),
+                    farmer.note.trim(),
+                    farmer.active
+                )
                 _events.emit(UiEvent.FarmerAdded)
                 farmers = repository.getAllFarmers()
             } catch (e: Exception) {
