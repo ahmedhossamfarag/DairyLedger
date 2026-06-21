@@ -75,7 +75,7 @@ fun ReportsContent(
     settingsViewModel: SettingsViewModel
 ) {
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
-    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
+    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault()) }
 
     val weekTitle = stringResource(R.string.week_number, reportsViewModel.week?.id ?: 0)
     val dateRange: String = reportsViewModel.week?.let { week ->

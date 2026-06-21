@@ -102,7 +102,7 @@ fun HomeMainContent(
     settingsViewModel: SettingsViewModel
 ) {
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
-    val dateFormatter = remember { SimpleDateFormat("MMM dd", Locale.ENGLISH) }
+    val dateFormatter = remember { SimpleDateFormat("MMM dd", Locale.getDefault()) }
 
     val weekLabel: String = homeViewModel.currentWeek?.let { week ->
         val calendar = Calendar.getInstance()
@@ -117,11 +117,11 @@ fun HomeMainContent(
     val morning: CollectionStatus = homeViewModel.todayCollectionSummary
         .find { it.type == CollectionType.MORNING }
         ?.let { CollectionStatus(morningCollectionLabel, true, numberFormatter.format(it.totalAmount), it.farmerCount) }
-        ?: CollectionStatus(morningCollectionLabel, false, "0", 0)
+        ?: CollectionStatus(morningCollectionLabel, false, numberFormatter.format(0), 0)
     val evening: CollectionStatus = homeViewModel.todayCollectionSummary
         .find { it.type == CollectionType.EVENING }
         ?.let { CollectionStatus(eveningCollectionLabel, true, numberFormatter.format(it.totalAmount), it.farmerCount) }
-        ?: CollectionStatus(eveningCollectionLabel, false, "0", 0)
+        ?: CollectionStatus(eveningCollectionLabel, false, numberFormatter.format(0), 0)
     val weeklyTotalLiters: String = numberFormatter.format(homeViewModel.currentWeekTotal)
     val unitPrice: Double by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
 

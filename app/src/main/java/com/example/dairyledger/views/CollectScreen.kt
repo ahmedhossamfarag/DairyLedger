@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.R
@@ -44,8 +46,7 @@ data class FarmerCollectionState(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectScreen(type: String = "default", navigator: Navigator, collectViewModel: CollectViewModel) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
-    val dayFormatter = remember { java.text.SimpleDateFormat("EEEE, MMMM d", Locale.ENGLISH) }
+    val dayFormatter = remember { java.text.SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()) }
 
     val collectionTypeKey =
         if (type == "morning") "morning"
@@ -72,7 +73,7 @@ fun CollectScreen(type: String = "default", navigator: Navigator, collectViewMod
     // Track the liters input for each farmer dynamically
     val volumesState = remember { 
         mutableStateMapOf<String, String>().apply {
-            initialFarmers.forEach { this[it.id] = numberFormatter.format(it.initialLiters) }
+            initialFarmers.forEach { this[it.id] = it.initialLiters.toString() }
         }
     }
 
@@ -332,23 +333,26 @@ private fun FarmerCollectionCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
-                    BasicTextField(
-                        value = volumeText,
-                        onValueChange = { input ->
-                            // Sanitize keyboard input to match standard decimal structures cleanly
-                            if (input.isEmpty() || input.matches(Regex("^\\d*(\\.\\d{0,2})?$"))) {
-                                onVolumeChange(input)
-                            }
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A),
-                            textAlign = TextAlign.Center
-                        ),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true
-                    )
+                    // FORCE LTR for numeric input only
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        BasicTextField(
+                            value = volumeText,
+                            onValueChange = { input ->
+                                // Use Locale.US for regex to ensure the '.' is handled correctly
+                                if (input.isEmpty() || input.matches(Regex("^\\d*(\\.\\d{0,2})?$"))) {
+                                    onVolumeChange(input)
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1A1A1A),
+                                textAlign = TextAlign.Center // Keeps text centered regardless of LTR/RTL
+                            ),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), // Use Decimal for better keyboard support
+                            singleLine = true
+                        )
+                    }
                     Text(
                         text = stringResource(R.string.liters_upper),
                         fontSize = 11.sp,

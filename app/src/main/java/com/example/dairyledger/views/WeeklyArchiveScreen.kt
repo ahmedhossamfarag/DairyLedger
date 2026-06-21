@@ -66,7 +66,7 @@ fun WeeklyArchiveContent(
     weekArchiveViewModel: WeeklyArchiveViewModel
 ) {
     val numberFormatter = remember { java.text.DecimalFormat("#,##0.00") }
-    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.ENGLISH) }
+    val dayFormatter = remember { java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault()) }
 
     val weeks = weekArchiveViewModel.weeks
     val activeFarmers = weekArchiveViewModel.activeFarmersCount

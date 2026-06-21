@@ -62,7 +62,7 @@ fun WeekClosingContent(
    settingsViewModel: SettingsViewModel
 ) {
     val numberFormatter = remember { DecimalFormat("#,##0.00") }
-    val dayFormatter = remember { java.text.SimpleDateFormat("EEE, MMM dd", java.util.Locale.ENGLISH) }
+    val dayFormatter = remember { java.text.SimpleDateFormat("EEE, MMM dd", java.util.Locale.getDefault()) }
 
     val weekEndingLabel: String = currentWeekViewModel.week?.let { week ->
         val calendar = Calendar.getInstance()

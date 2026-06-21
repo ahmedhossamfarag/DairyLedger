@@ -18,18 +18,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.R
 import com.example.dairyledger.models.SettingsViewModel
 import com.example.dairyledger.ui.icons.AppIcons
 import java.text.DecimalFormat
+import java.util.Locale
 
 
 @Composable
@@ -66,8 +69,8 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
     }
 
     // Component Interaction States
-    val defaultPrice by settingsViewModel.defaultPrice.collectAsState(initial = 0.0)
-    var unitPrice by remember { mutableDoubleStateOf(defaultPrice) }
+    val defaultPrice by settingsViewModel.defaultPrice.collectAsState()
+    var unitPrice by remember(defaultPrice) { mutableStateOf(defaultPrice.toString()) }
     val defaultResetDay = stringResource(R.string.friday_evening)
     val defaultCurrency = stringResource(R.string.currency_egp)
     var resetDay by remember(defaultResetDay) { mutableStateOf(defaultResetDay) }
@@ -119,7 +122,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 
             // Action Execution Buttons Stack
             Button(
-                onClick = { onSaveConfigClick(unitPrice) },
+                onClick = { unitPrice.toDoubleOrNull()?.let { onSaveConfigClick(it) }},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -217,10 +220,8 @@ private fun AgentProfileCard(name: String, route: String) {
 }
 
 @Composable
-private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit) {
-    val numberFormatter = remember { DecimalFormat("#,##0.00") }
-
-    var textValue by remember(currentPrice) { mutableStateOf(numberFormatter.format(currentPrice)) }
+private fun UnitPriceCard(currentPrice: String, onPriceChange: (String) -> Unit) {
+    var textValue by remember(currentPrice) { mutableStateOf(currentPrice.toString()) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -244,7 +245,12 @@ private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit)
             ) {
                 // Decrement Button Control
                 OutlinedIconButton(
-                    onClick = { onPriceChange((currentPrice - 0.01).coerceAtLeast(0.0)) },
+                    onClick = {
+                        val currentVal = currentPrice.toDoubleOrNull() ?: 0.0
+                        if (currentVal >= 0.01) {
+                            onPriceChange(String.format(Locale.US, "%.2f", currentVal - 0.01))
+                        }
+                    },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.size(46.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
@@ -263,30 +269,35 @@ private fun UnitPriceCard(currentPrice: Double, onPriceChange: (Double) -> Unit)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "$", fontSize = 14.sp, color = MutedText, modifier = Modifier.padding(end = 6.dp))
-                        BasicTextField(
-                            value = textValue,
-                            onValueChange = { input ->
-                                // Sanitize keyboard input to match standard decimal structures cleanly
-                                if (input.isEmpty() || input.matches(Regex("^\\d*\\.?\\d*$"))) {
-                                    textValue = input
-                                    input.toDoubleOrNull()?.let { onPriceChange(it) }
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1A1A1A),
-                                textAlign = TextAlign.Center
-                            ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            singleLine = true
-                        )
+                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                            BasicTextField(
+                                value = textValue,
+                                onValueChange = { input ->
+                                    // Sanitize keyboard input to match standard decimal structures cleanly
+                                    if (input.isEmpty() || input.matches(Regex("^\\d*(\\.\\d{0,2})?$"))) {
+                                        textValue = input
+                                        onPriceChange(input)
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1A1A1A),
+                                    textAlign = TextAlign.Center
+                                ),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                singleLine = true
+                            )
+                        }
                     }
                 }
 
                 // Increment Button Control
                 OutlinedIconButton(
-                    onClick = { onPriceChange(currentPrice + 0.01) },
+                    onClick = {
+                        val currentVal = currentPrice.toDoubleOrNull() ?: 0.0
+                        onPriceChange(String.format(Locale.US, "%.2f", currentVal + 0.01))
+                    },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.size(46.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
