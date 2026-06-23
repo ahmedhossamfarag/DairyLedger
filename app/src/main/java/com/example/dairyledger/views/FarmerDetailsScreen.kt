@@ -76,7 +76,7 @@ fun FarmerDetailsScreenContent(
     val farmerCollections = farmerDetailsViewModel.collectionDetails
     val farmerName: String = farmer.name
     val phone: String = farmer.phone
-    val idNumber: String = farmerDetailsViewModel.farmerId.toString()
+    val farmerOrder: String = farmer.order.toString()
     val statusLabel: String = if (farmer.active) stringResource(R.string.active) else stringResource(R.string.inactive)
     val morningTotal: String = numberFormatter.format(
         farmerCollections
@@ -120,7 +120,7 @@ fun FarmerDetailsScreenContent(
             FarmerIdentityProfileCard(
                 name = farmerName,
                 phone = phone,
-                idNumber = idNumber,
+                order = farmerOrder,
                 active = farmer.active,
                 status = statusLabel
             )
@@ -210,7 +210,7 @@ private fun FarmerDetailsTopBar(
 }
 
 @Composable
-private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: String, active: Boolean, status: String) {
+private fun FarmerIdentityProfileCard(name: String, phone: String, order: String, active: Boolean, status: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -270,9 +270,9 @@ private fun FarmerIdentityProfileCard(name: String, phone: String, idNumber: Str
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(stringResource(R.string.id_number), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
+                    Text(stringResource(R.string.farmer_order), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MutedText)
                     Spacer(Modifier.height(2.dp))
-                    Text(idNumber, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
+                    Text(order, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DairyGreen)
                 }
 
                 Column(

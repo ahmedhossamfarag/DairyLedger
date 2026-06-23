@@ -140,6 +140,7 @@
     <string name="evening_collection_indexed">Evening Collection #%1$d</string>
     <string name="collection_archive">Collection Archive</string>
     <string name="name_is_too_short">Name is too short</string>
+    <string name="farmer_order">Order</string>
     <string-array name="days_of_week_short">
         <item>Sat</item>
         <item>Sun</item>

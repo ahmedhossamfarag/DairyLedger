@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dairyledger.R
@@ -29,11 +31,12 @@ import com.example.dairyledger.ui.icons.AppIcons
 fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     val routeLabel = stringResource(R.string.register_new_producer)
     val onCancelClick: () -> Unit = { navigator.gotoFarmers() }
-    val onSaveFarmerClick: (name: String, phone: String, notes: String) -> Unit = {
-        name, phone, notes -> farmersViewModel.addFarmer(
+    val onSaveFarmerClick: (name: String, order: Int, phone: String, notes: String) -> Unit = {
+        name, order, phone, notes -> farmersViewModel.addFarmer(
         Farmer(
             -1,
             name,
+            order,
             phone,
             notes
         )
@@ -67,6 +70,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
     }
 
     var farmerName by remember { mutableStateOf("") }
+    var farmerOrder by remember { mutableStateOf((farmersViewModel.farmers.size+1).toString()) }
     var phoneNumber by remember { mutableStateOf("") }
     var additionalNotes by remember { mutableStateOf("") }
 
@@ -164,6 +168,17 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
             Spacer(Modifier.height(16.dp))
 
             FormInputField(
+                label = stringResource(R.string.farmer_order), // Ensure this exists in strings.xml
+                value = farmerOrder,
+                onValueChange = { if (it.all { char -> char.isDigit() }) farmerOrder = it },
+                placeholder = "e.g. 1",
+                leadingIcon = AppIcons.Order, // Or another appropriate icon
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            FormInputField(
                 label = stringResource(R.string.phone_number),
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
@@ -203,7 +218,7 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
                 }
 
                 Button(
-                    onClick = { onSaveFarmerClick(farmerName, phoneNumber, additionalNotes) },
+                    onClick = { onSaveFarmerClick(farmerName, farmerOrder.toIntOrNull() ?: 0, phoneNumber, additionalNotes) },
                     modifier = Modifier
                         .weight(1f)
                         .height(50.dp),
@@ -234,6 +249,7 @@ private fun FormInputField(
     placeholder: String,
     leadingIcon: Int,
     singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -256,7 +272,8 @@ private fun FormInputField(
                 unfocusedContainerColor = Color.White,
                 focusedBorderColor = CardBorder,
                 unfocusedBorderColor = CardBorder
-            )
+            ),
+            keyboardOptions = keyboardOptions
         )
     }
 }

@@ -58,4 +58,6 @@ object AppIcons {
     val StarOutline = R.drawable.baseline_star_border_24
     val Lock = R.drawable.baseline_lock_24
     val AddCircle = R.drawable.baseline_add_circle_24
+    val Order = R.drawable.baseline_123_24
+
 }

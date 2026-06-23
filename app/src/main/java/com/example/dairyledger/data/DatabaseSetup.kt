@@ -13,6 +13,7 @@ data class Farmer(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
+    val order: Int,
     val phone: String = "",
     val note: String = "",
     val active: Boolean = true
@@ -146,10 +147,10 @@ interface FarmerDao {
     @Query("UPDATE farmer SET active = :active WHERE id = :farmerId")
     suspend fun setActive(farmerId: Long, active: Boolean)
 
-    @Query("SELECT * FROM farmer WHERE active = 1 ORDER BY name ASC")
+    @Query("SELECT * FROM farmer WHERE active = 1 ORDER BY `order` ASC")
     suspend fun getActiveFarmers(): List<Farmer>
 
-    @Query("SELECT * FROM farmer ORDER BY name ASC")
+    @Query("SELECT * FROM farmer ORDER BY `order` ASC")
     suspend fun getAllFarmers(): List<Farmer>
 
     @Query("SELECT * FROM farmer WHERE id = :farmerId LIMIT 1")
@@ -259,7 +260,7 @@ interface DairyDao {
         INNER JOIN collection c ON d.collectionId = c.id
         WHERE c.weekId = :weekId
         GROUP BY f.id, f.name
-        ORDER BY f.name ASC
+        ORDER BY f.`order` ASC
         """
     )
     suspend fun getFarmerTotalsForWeek(weekId: Long): List<FarmerWeekTotal>
@@ -296,7 +297,7 @@ interface DairyDao {
         FROM dairy d
         INNER JOIN farmer f ON d.farmerId = f.id
         WHERE d.collectionId = :collectionId
-        ORDER BY farmerName ASC
+        ORDER BY f.`order` ASC
         """
     )
     suspend fun getCollectionDairies(collectionId: Long): List<FarmersDairies>

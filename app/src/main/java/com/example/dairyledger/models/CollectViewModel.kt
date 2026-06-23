@@ -48,7 +48,7 @@ class CollectViewModel(
                 } else {
                     collection = repository.getCollection(collectionId)
                     val dairies = repository.getCollectionDairies(collectionId)
-                    activeFarmers = dairies.map { Farmer(it.farmerId, it.farmerName) }
+                    activeFarmers = dairies.map { Farmer(it.farmerId, it.farmerName, -1) }
                     dairies.forEach {
                         volumes[it.farmerId] =
                             String.format(Locale.US, "%.2f",  it.value)

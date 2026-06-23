@@ -141,6 +141,7 @@
     <string name="evening_collection_indexed">التجميع المسائي #%1$d</string>
     <string name="collection_archive">أرشيف التجميع</string>
     <string name="name_is_too_short">أدخل اسم مناسب</string>
+    <string name="farmer_order">الترتيب</string>
     <string-array name="days_of_week_short">
         <item>السبت</item>
         <item>الأحد</item>

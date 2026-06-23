@@ -62,8 +62,8 @@ class DairyRepository(context: Context) {
     // Add Farmer
     // ============================================================
 
-    suspend fun addFarmer(name: String, phone: String, note: String = "", active: Boolean = true): Long {
-        val farmer = Farmer(name = name, phone = phone, note = note, active = active)
+    suspend fun addFarmer(name: String, order: Int, phone: String, note: String = "", active: Boolean = true): Long {
+        val farmer = Farmer(name = name, order = order, phone = phone, note = note, active = active)
         return farmerDao.insert(farmer)
     }
 

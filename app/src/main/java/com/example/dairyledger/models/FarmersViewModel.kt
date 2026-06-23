@@ -39,8 +39,13 @@ class FarmersViewModel(
                     _events.emit(UiEvent.NameLengthError)
                     return@launch
                 }
+                if (farmers.any { it.name.trim() == farmer.name.trim() }) {
+                    _events.emit(UiEvent.Error("Farmer with the same name already exists"))
+                    return@launch
+                }
                 repository.addFarmer(
                     farmer.name.trim(),
+                    farmer.order,
                     farmer.phone.trim(),
                     farmer.note.trim(),
                     farmer.active
