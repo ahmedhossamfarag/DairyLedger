@@ -109,7 +109,8 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
     val gotoCollectWithType = { type: String ->
         navigateTab(NavItem.Collect.createRoute(type))
     }
-    val gotoAddFarmer = { navController.navigate(NavItem.AddFarmer.route) }
+    val gotoAddFarmer = { navController.navigate(NavItem.AddFarmer.defaultRoute) }
+    val gotoEditFarmer = { farmerId: Int -> navController.navigate(NavItem.AddFarmer.createRoute(farmerId)) }
     val gotoFarmerDetails = { farmerId: Int ->
         navController.navigate(NavItem.FarmerDetails.createRoute(farmerId))
     }
@@ -134,6 +135,7 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
         gotoCollectWithType,
         gotoCollection,
         gotoAddFarmer,
+        gotoEditFarmer,
         gotoFarmerDetails,
         gotoWeekClosing,
         goback
@@ -213,13 +215,17 @@ fun DairyApp(repository: DairyRepository, settingsRepository: SettingsRepository
                 SettingsScreen(settingVM)
             }
 
-            composable(NavItem.AddFarmer.route) {
+            composable(NavItem.AddFarmer.route,
+                arguments = listOf(navArgument("farmerId") { type = NavType.LongType })
+            ) {
                 // Fetch the identical FarmersViewModel from the Farmers destination backstack entry
                 val farmersEntry = remember(it) { navController.getBackStackEntry(NavItem.Farmers.route) }
                 val vm: FarmersViewModel = viewModel(
                     viewModelStoreOwner = farmersEntry,
                     factory = ViewModelFactory(repository)
                 )
+                val farmerId = it.arguments?.getLong("farmerId") ?: -1
+                LaunchedEffect(farmerId) { vm.loadFarmer(farmerId) }
                 AddFarmerScreen(navigator, vm)
             }
 

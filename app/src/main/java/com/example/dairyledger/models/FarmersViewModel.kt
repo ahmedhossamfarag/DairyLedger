@@ -26,9 +26,21 @@ class FarmersViewModel(
     var farmers by mutableStateOf<List<Farmer>>(emptyList())
         private set
 
+    var activeFarmer by mutableStateOf<Farmer?>(null)
+
     init {
         viewModelScope.launch {
             farmers = repository.getAllFarmers()
+        }
+    }
+
+    fun loadFarmer(id: Long) {
+        viewModelScope.launch {
+            if (id == -1L) {
+                activeFarmer = null
+            } else {
+                activeFarmer = repository.getFarmerById(id)
+            }
         }
     }
 
@@ -39,17 +51,28 @@ class FarmersViewModel(
                     _events.emit(UiEvent.NameLengthError)
                     return@launch
                 }
-                if (farmers.any { it.name.trim() == farmer.name.trim() }) {
+                if (farmers.any { it.name.trim() == farmer.name.trim() && it.id != activeFarmer?.id }) {
                     _events.emit(UiEvent.Error("Farmer with the same name already exists"))
                     return@launch
                 }
-                repository.addFarmer(
-                    farmer.name.trim(),
-                    farmer.order,
-                    farmer.phone.trim(),
-                    farmer.note.trim(),
-                    farmer.active
-                )
+                if (activeFarmer != null) {
+                    repository.updateFarmer(
+                        activeFarmer!!.id,
+                        farmer.name.trim(),
+                        farmer.order,
+                        farmer.phone.trim(),
+                        farmer.note.trim(),
+                        farmer.active
+                    )
+                } else {
+                    repository.addFarmer(
+                        farmer.name.trim(),
+                        farmer.order,
+                        farmer.phone.trim(),
+                        farmer.note.trim(),
+                        farmer.active
+                    )
+                }
                 _events.emit(UiEvent.FarmerAdded)
                 farmers = repository.getAllFarmers()
             } catch (e: Exception) {

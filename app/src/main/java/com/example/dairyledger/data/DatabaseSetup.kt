@@ -144,6 +144,9 @@ interface FarmerDao {
     @Insert
     suspend fun insert(farmer: Farmer): Long
 
+    @Update
+    suspend fun update(farmer: Farmer)
+
     @Query("UPDATE farmer SET active = :active WHERE id = :farmerId")
     suspend fun setActive(farmerId: Long, active: Boolean)
 

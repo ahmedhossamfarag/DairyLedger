@@ -3,6 +3,7 @@ package com.example.dairyledger.views
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -104,6 +105,7 @@ fun FarmerDetailsScreenContent(
             FarmerDetailsTopBar(
                 title = farmerName,
                 onBackClick = onBackClick,
+                onEditClick = { navigator.gotoEditFarmer(farmer.id.toInt()) }
             )
         },
     ) { innerPadding ->
@@ -184,6 +186,7 @@ fun FarmerDetailsScreenContent(
 private fun FarmerDetailsTopBar(
     title: String,
     onBackClick: () -> Unit,
+    onEditClick: () -> Unit = {}
 ) {
     Surface(color = ScreenBg) {
         Row(
@@ -204,6 +207,9 @@ private fun FarmerDetailsTopBar(
                     fontWeight = FontWeight.Bold,
                     color = DairyGreen
                 )
+            }
+            IconButton(onClick = onEditClick) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.farmer_details), tint = DairyGreen)
             }
         }
     }

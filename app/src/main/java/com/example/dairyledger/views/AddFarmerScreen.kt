@@ -69,10 +69,14 @@ fun AddFarmerScreen(navigator: Navigator, farmersViewModel: FarmersViewModel) {
         }
     }
 
-    var farmerName by remember { mutableStateOf("") }
-    var farmerOrder by remember { mutableStateOf((farmersViewModel.farmers.size+1).toString()) }
-    var phoneNumber by remember { mutableStateOf("") }
-    var additionalNotes by remember { mutableStateOf("") }
+    val activeFarmer = farmersViewModel.activeFarmer
+
+    var farmerName by remember(activeFarmer) { mutableStateOf(activeFarmer?.name ?: "") }
+    var farmerOrder by remember(activeFarmer) { mutableStateOf(
+        activeFarmer?.order?.toString()
+            ?: (farmersViewModel.farmers.size+1).toString()) }
+    var phoneNumber by remember(activeFarmer) { mutableStateOf(activeFarmer?.phone ?: "") }
+    var additionalNotes by remember(activeFarmer) { mutableStateOf(activeFarmer?.note ?: "") }
 
     Scaffold(
         containerColor = ScreenBg,

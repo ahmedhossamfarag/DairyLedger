@@ -27,9 +27,9 @@ sealed class NavItem(
     data object Farmers : NavItem("farmers", R.string.farmers, AppIcons.People)
     data object WeeklyArchive : NavItem("weekly-archive", R.string.weekly_archive, AppIcons.Inventory)
     data object Settings : NavItem("settings", R.string.settings, AppIcons.Settings)
-    data object AddFarmer : NavItem("add-farmer", R.string.add_farmer, AppIcons.AddPerson)
-
-
+    data object AddFarmer : NavItem("add-farmer/{farmerId}", R.string.add_farmer, AppIcons.AddPerson, "add-farmer/-1") {
+        fun createRoute(farmerId: Int) = "add-farmer/$farmerId"
+    }
     data object FarmerDetails : NavItem("farmer-details/{farmerId}", R.string.farmer_details, AppIcons.Description) {
         fun createRoute(farmerId: Int) = "farmer-details/$farmerId"
     }
@@ -69,6 +69,7 @@ class Navigator(
     val gotoCollectWithType: (type: String) -> Unit,
     val gotoCollection: (collectionId: Int) -> Unit,
     val gotoAddFarmer: () -> Unit,
+    val gotoEditFarmer: (farmerId: Int) -> Unit,
     val gotoFarmerDetails: (farmerId: Int) -> Unit,
     val gotoWeekClosing: () -> Unit,
     val goback: () -> Boolean,

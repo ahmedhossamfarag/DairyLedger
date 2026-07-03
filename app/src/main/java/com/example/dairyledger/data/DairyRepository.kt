@@ -68,6 +68,15 @@ class DairyRepository(context: Context) {
     }
 
     // ============================================================
+    // Update Farmer
+    // ============================================================
+
+    suspend fun updateFarmer(id: Long, name: String, order: Int, phone: String, note: String = "", active: Boolean = true) {
+        val farmer = Farmer(id = id, name = name, order = order, phone = phone, note = note, active = active)
+        farmerDao.update(farmer)
+    }
+
+    // ============================================================
     // Mark Farmer Active / Inactive
     // ============================================================
 
